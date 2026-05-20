@@ -24,6 +24,10 @@ apis:
       - type: Documentation
         url: https://zenoss.github.io/zenoss-prodbin/
 common:
+  - type: GitHubOrganization
+    url: https://github.com/zenoss
+  - type: LinkedIn
+    url: https://www.linkedin.com/company/zenoss-inc-
   - type: Website
     url: https://www.zenoss.com
   - type: Documentation
