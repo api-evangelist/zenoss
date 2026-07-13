@@ -1,0 +1,18 @@
+{
+  "repo": "zenoss",
+  "feeds": [
+    {
+      "source": "https://www.virtana.com/feed/",
+      "feed_url": "https://www.virtana.com/feed/",
+      "title": "",
+      "saved": 0,
+      "method": "feed"
+    },
+    {
+      "source": "https://zenoss.github.io/zenoss-prodbin/",
+      "error": "HTTPError"
+    }
+  ],
+  "fetched": "2026-07-11T11:50:51Z",
+  "post_count": 18
+}
