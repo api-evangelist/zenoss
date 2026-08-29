@@ -1,0 +1,105 @@
+generated: '2026-08-29'
+method: probed
+source: live GET probes of /.well-known/* on every Zenoss/Virtana host named in apis.yml and in the API endpoint reference
+description: >-
+  Probe record for well-known discovery documents across the Zenoss (Virtana Service Observability)
+  hosts. Every path returned 404. No WellKnown or SecurityTxt pointer is emitted in apis.yml because
+  nothing was served — this file records a verified absence, not a presence.
+hosts:
+  - host: docs.zenoss.io
+    documents:
+      - path: /.well-known/security.txt
+        status: 404
+        file: null
+      - path: /.well-known/openid-configuration
+        status: 404
+        file: null
+      - path: /.well-known/oauth-authorization-server
+        status: 404
+        file: null
+      - path: /.well-known/oauth-protected-resource
+        status: 404
+        file: null
+      - path: /.well-known/api-catalog
+        status: 404
+        file: null
+      - path: /.well-known/ai-plugin.json
+        status: 404
+        file: null
+      - path: /.well-known/agent-card.json
+        status: 404
+        file: null
+      - path: /.well-known/agent.json
+        status: 404
+        file: null
+  - host: api.virtana.ai
+    documents:
+      - path: /.well-known/security.txt
+        status: 404
+        file: null
+      - path: /.well-known/openid-configuration
+        status: 404
+        file: null
+      - path: /.well-known/oauth-authorization-server
+        status: 404
+        file: null
+      - path: /.well-known/oauth-protected-resource
+        status: 404
+        file: null
+      - path: /.well-known/api-catalog
+        status: 404
+        file: null
+      - path: /.well-known/ai-plugin.json
+        status: 404
+        file: null
+      - path: /.well-known/agent-card.json
+        status: 404
+        file: null
+      - path: /.well-known/agent.json
+        status: 404
+        file: null
+  - host: www.virtana.com
+    documents:
+      - path: /.well-known/security.txt
+        status: 404
+        file: null
+      - path: /.well-known/openid-configuration
+        status: 404
+        file: null
+      - path: /.well-known/oauth-authorization-server
+        status: 404
+        file: null
+      - path: /.well-known/api-catalog
+        status: 404
+        file: null
+      - path: /.well-known/ai-plugin.json
+        status: 404
+        file: null
+      - path: /.well-known/agent-card.json
+        status: 404
+        file: null
+      - path: /.well-known/agent.json
+        status: 404
+        file: null
+  - host: www.zenoss.com
+    documents:
+      - path: /.well-known/security.txt
+        status: 301
+        file: null
+      - path: /.well-known/api-catalog
+        status: 301
+        file: null
+      - path: /.well-known/agent-card.json
+        status: 301
+        file: null
+      - path: /.well-known/agent.json
+        status: 301
+        file: null
+notes:
+  - >-
+    www.zenoss.com no longer serves content of its own — every path 301s and the site root resolves
+    to https://www.virtana.com/service-observability/ following Virtana's acquisition and rebrand of
+    the Zenoss product line.
+  - >-
+    api.virtana.ai answers every unrouted path with a plain-text "default backend - 404", so the
+    absences above are genuine 404s rather than an SPA catch-all returning 200 with HTML.

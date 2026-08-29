@@ -1,0 +1,106 @@
+generated: '2026-08-29'
+method: searched
+source: https://docs.zenoss.io/admin/clients/zenoss-api.html
+docs:
+  - https://docs.zenoss.io/api/zenoss-api.html
+  - https://docs.zenoss.io/admin/clients/zenoss-api.html
+  - https://docs.zenoss.io/admin/clients/cz-api.html
+  - https://www.virtana.com/trust/
+  - https://docs.zenoss.com/api/how-to/use-curl.html
+provider: Zenoss
+providerId: zenoss
+description: >-
+  Authentication profile for the Virtana Service Observability API (formerly the Zenoss Cloud API).
+  There are three distinct schemes across two API generations: the /v1 services take a long-lived key
+  in a zenoss-api-key header, the legacy Collection Zone router API takes a key in a DIFFERENTLY NAMED
+  z-api-key header, and on-premises Resource Manager router calls use HTTP Basic. There is no OAuth
+  2.0 or OpenID Connect flow on any API surface. OIDC, SAML and LDAP exist on the
+  Zenoss/Virtana platform for interactive single sign-on to the web application, not for API clients.
+schemes:
+  - id: zenoss-api-key
+    type: apiKey
+    in: header
+    name: zenoss-api-key
+    description: >-
+      Long-lived authentication key issued from ADMIN > API Clients. Sent in the zenoss-api-key header
+      of every request. Applies to both the REST/JSON services and the gRPC data receiver, and to the
+      OpenTelemetry OTLP exporter (header zenoss-api-key=YOUR-ZENOSS-API-KEY).
+    applies_to:
+      - REST /v1 services
+      - gRPC DataReceiverService / DataRegistryService
+      - OpenTelemetry OTLP metric export
+    source: https://docs.zenoss.io/api/zenoss-api.html
+  - id: z-api-key
+    type: apiKey
+    in: header
+    name: z-api-key
+    description: >-
+      Authentication key for the Zenoss API for Collection Zone and Resource Manager (the JSON router
+      API). Note the header name differs from the /v1 services — z-api-key, not zenoss-api-key.
+      Collection Zone keys are created by users on their Account Settings page and inherit the
+      creating user's Collection Zone roles.
+    applies_to:
+      - POST /cz0/zport/dmd/<router> on a Collection Zone host
+    source: https://docs.zenoss.com/api/how-to/use-curl.html
+  - id: basic-auth
+    type: http
+    scheme: basic
+    description: >-
+      HTTP Basic authentication (api-username:api-password) for on-premises Zenoss Resource Manager /
+      Service Dynamics router calls. Documented as `-u "api-username:api-password"` against
+      https://<host>/zport/dmd/<router>.
+    applies_to:
+      - POST /zport/dmd/<router> on a Resource Manager host
+    source: https://docs.zenoss.com/api/how-to/use-curl.html
+key_types:
+  - name: User Management API
+    grants: The user management service (/v1/user-mgmt/*).
+    source: https://docs.zenoss.io/admin/clients/zenoss-api.html
+  - name: User API
+    grants: >-
+      Most general user operations. Required to interact with the model context API — entity
+      management, custom properties, production state and priority, entity activity and schema ID.
+    source: https://docs.zenoss.io/admin/clients/zenoss-api.html
+  - name: Streaming Data Ingest API
+    grants: All Virtana Service Observability API services except the User and User Management sets.
+    source: https://docs.zenoss.io/admin/clients/zenoss-api.html
+  - name: Collection Zone API key
+    grants: >-
+      The legacy Collection Zone API. Carries only the permissions of the creating user's Collection
+      Zone roles, and those permissions change when the user's roles change.
+    source: https://docs.zenoss.io/admin/clients/cz-api.html
+key_management:
+  issuer_ui: ADMIN > API Clients (Virtana Service Observability console)
+  required_role: Key Administrator or Manager (Key Creator for Collection Zone keys)
+  keys_per_client: 200
+  cz_keys_per_user: 130
+  retrievable_after_creation: false
+  rotation: >-
+    Keys cannot be retrieved after creation; a lost key must be deleted and regenerated. Deleting a
+    key or its parent API Client denies access to clients using it within 60 seconds.
+  expiry: >-
+    Keys do not expire, and are not revoked when the creating user's account is removed or their
+    Key Creator role is withdrawn — revocation is manual.
+  audit: API Client names are written to audit logs on every update made through the API.
+  source: https://docs.zenoss.io/admin/clients/zenoss-api.html
+sso:
+  applies_to: Interactive sign-in to the Virtana/Zenoss platform, not to API clients.
+  protocols:
+    - LDAP
+    - SAML
+    - OIDC
+  mfa: Virtana states multi-factor authentication is used on all systems, for all access points.
+  source: https://www.virtana.com/trust/
+oauth2: false
+openid_connect_api: false
+mutual_tls: false
+transport:
+  https_required: true
+  note: All API endpoints require HTTPS; the docs state all services require encryption.
+unauthenticated_status_codes:
+  - code: 401
+    meaning: missing or invalid authentication key
+  - code: 500
+    meaning: >-
+      Documented on some resources as "missing or invalid authentication key" — an inconsistency in
+      the published status-code tables, recorded as found rather than corrected.

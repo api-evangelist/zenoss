@@ -1,64 +1,228 @@
 aid: zenoss
 name: Zenoss
 description: >-
-  Zenoss is an AIOps and full-stack monitoring platform for hybrid IT infrastructure observability and event management.
+  Zenoss is an AIOps and full-stack IT infrastructure monitoring platform, acquired by Virtana in May
+  2025 and now sold as Virtana Service Observability. It ingests metrics, events and entity models
+  from hybrid estates — VMware, Nutanix, Kubernetes, AWS, Azure, GCP, network and storage — through
+  on-premises Collection Zones, streaming agents and OpenTelemetry/OTLP, then applies dependency
+  mapping, event correlation and anomaly detection to turn raw signal into service impact. The
+  developer surface is a versioned /v1 REST API covering data ingest, event query and management,
+  entity/model context, maintenance windows, the metric dictionary, notification Actions, credentials
+  and user management, plus first-party proto3/gRPC contracts for the data receiver and data registry.
+  API clients authenticate with a long-lived key in the zenoss-api-key header, issued per API Client
+  from the console, and each tenant is assigned one of four regional endpoints.
 type: Index
 deliveryModel:
-  model: unknown
+  model: saas
   open_source: false
-  commercial: false
-  callable_host: false
-  label: Delivery model not determined — needs a product licence on record
-  confidence: low
+  commercial: true
+  callable_host: true
+  label: Hosted service · you call their endpoint
+  confidence: medium
   source:
-  - none
-  generated: '2026-08-28'
+  - documentation
+  - grpc
+  generated: '2026-08-29'
   method: derived
 accessModel:
-  pricing: freemium
-  onboarding: unknown
+  pricing: contact-sales
+  onboarding: sales-led
   trial: false
   try_now: false
   public: false
-  label: Freemium
-  confidence: medium
+  label: Contact sales
+  confidence: high
   source:
   - plans
-  generated: '2026-07-22'
-  method: derived
+  generated: '2026-08-29'
+  method: searched
 image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/zenoss.png
 tags:
   - AIOps
   - Monitoring
+  - Observability
+  - Infrastructure
+  - Event Management
+  - Hybrid Cloud
+  - OpenTelemetry
+  - gRPC
+  - Metrics
 url: >-
   https://raw.githubusercontent.com/api-evangelist/zenoss/refs/heads/main/apis.yml
 created: '2026-03-27'
-modified: '2026-03-27'
+modified: '2026-08-29'
 specificationVersion: '0.23'
 apis:
   - aid: zenoss:zenoss
-    name: Zenoss
+    name: Virtana Service Observability API
     description: >-
-      Zenoss is an AIOps and full-stack monitoring platform for hybrid IT infrastructure observability and event management.
-    humanURL: https://www.zenoss.com
+      Versioned /v1 REST API for the Zenoss (Virtana Service Observability) platform. Covers the data
+      receiver (metrics, events, entity models), event query and event management, model context
+      (entity search, custom properties, maintenance windows), the metric/entity-field/event-field
+      dictionary, notification Actions (triggers, rules, destinations), credentials, and user and
+      group management. JSON over HTTPS, authenticated with a long-lived key in the zenoss-api-key
+      header. Non-CRUD operations use Google AIP custom-method colon suffixes (:search, :count,
+      :batchGet, :deleteBulk). Each tenant is assigned one of four regional endpoints — api.virtana.ai
+      (Iowa), api2 (Las Vegas), api3 (Sydney), api4 (Frankfurt).
+    humanURL: https://docs.zenoss.io/api/zenoss-api.html
+    baseURL: https://api.virtana.ai
     tags:
       - AIOps
+      - Monitoring
+      - Observability
+      - Event Management
+      - Metrics
     properties:
       - type: Documentation
-        url: https://zenoss.github.io/zenoss-prodbin/
+        url: https://docs.zenoss.io/
+      - type: APIReference
+        url: https://docs.zenoss.io/api/zenoss-api.html
+      - type: GettingStarted
+        url: https://docs.zenoss.io/start/get-started.html
+      - type: Authentication
+        url: authentication/zenoss-authentication.yml
+      - type: Conventions
+        url: conventions/zenoss-conventions.yml
+      - type: ErrorCatalog
+        url: errors/zenoss-problem-types.yml
+      - type: DataModel
+        url: data-model/zenoss-data-model.yml
+      - type: Webhooks
+        url: asyncapi/zenoss-webhooks.yml
+  - aid: zenoss:zenoss-grpc
+    name: Zenoss Cloud gRPC Services
+    description: >-
+      First-party proto3 service contracts published at github.com/zenoss/zenoss-protobufs and
+      released as a Go module (v1.5.5, 2026-07-27). DataReceiverService carries unary PutEvents,
+      PutMetrics and PutModels plus client-streaming PutEvent, PutMetric and PutModel;
+      DataRegistryService registers metric and definition metadata; CredentialManagement reads stored
+      credentials; CollectionConfigService streams collection configuration to probes. RPCs carry
+      google.api.http annotations binding them to the same /v1 REST paths, so the protobufs are the
+      machine-readable contract behind the ingest surface.
+    humanURL: https://docs.zenoss.io/api/receiver/data-receiver.html
+    baseURL: https://api.virtana.ai
+    tags:
+      - gRPC
+      - Metrics
+      - Event Management
+      - OpenTelemetry
+    properties:
+      - type: Protobuf
+        url: grpc/zenoss-data-receiver.proto
+      - type: Protobuf
+        url: grpc/zenoss-data-registry.proto
+      - type: Protobuf
+        url: grpc/zenoss-credentials.proto
+      - type: Protobuf
+        url: grpc/zenoss-collection-cfg.proto
+      - type: SourceCode
+        url: https://github.com/zenoss/zenoss-protobufs
+      - type: Documentation
+        url: https://docs.zenoss.io/api/receiver/data-receiver.html
+  - aid: zenoss:zenoss-router-api
+    name: Zenoss API for Collection Zone and Resource Manager
+    description: >-
+      The long-standing Zenoss JSON router API, still documented and supported for Zenoss Cloud
+      Collection Zones and on-premises Zenoss Resource Manager / Service Dynamics. Every call is an
+      HTTP POST of a JSON envelope — {"action": "<Router>", "method": "<method>", "data": [...],
+      "tid": <n>} — to a router path under /zport/dmd (for example device_router, events_router,
+      triggers_router). 61 routers are documented, covering devices, events, event classes, triggers,
+      templates, reports, jobs, users, LDAP, SAML IdP, licensing, ZenPacks, impact and vendor-specific
+      surfaces (AWS, Azure, vSphere, Hyper-V, OpenStack, Cisco UCS, EMC Isilon, SMI-S). Collection
+      Zones authenticate with a z-api-key header; Resource Manager uses HTTP Basic. Zenoss states that
+      some of this functionality will be replaced by the newer /v1 API services over time.
+    humanURL: https://docs.zenoss.com/api/background.html
+    baseURL: https://{collection-zone-host}/cz0/zport/dmd
+    tags:
+      - Monitoring
+      - Event Management
+      - Infrastructure
+    properties:
+      - type: Documentation
+        url: https://docs.zenoss.com/api/background.html
+      - type: APIReference
+        url: https://docs.zenoss.com/api/reference/devicerouter.html
+      - type: GettingStarted
+        url: https://docs.zenoss.com/api/how-to/use-curl.html
+      - type: Authentication
+        url: authentication/zenoss-authentication.yml
+      - type: Conventions
+        url: conventions/zenoss-conventions.yml
 common:
-  - type: DomainSecurity
-    url: security/zenoss-domain-security.yml
+  - type: Website
+    url: https://www.zenoss.com
+  - type: Documentation
+    url: https://docs.zenoss.io/
+  - type: APIReference
+    url: https://docs.zenoss.io/api/zenoss-api.html
+  - type: GettingStarted
+    url: https://docs.zenoss.io/start/get-started.html
   - type: GitHubOrganization
     url: https://github.com/zenoss
   - type: LinkedIn
     url: https://www.linkedin.com/company/zenoss-inc-
-  - type: Website
-    url: https://www.zenoss.com
-  - type: Documentation
-    url: https://zenoss.github.io/zenoss-prodbin/
   - type: Blog
+    url: https://www.virtana.com/blog/
+  - type: BlogRSS
     url: https://www.virtana.com/feed/
+  - type: Support
+    url: https://www.virtana.com/support/
+  - type: Login
+    url: https://app.cloud.virtana.com/ui/new-signin
+  - type: TermsOfService
+    url: https://www.virtana.com/legal-notices/
+  - type: PrivacyPolicy
+    url: https://www.virtana.com/privacy/
+  - type: StatusPage
+    url: https://status.zenoss.io/
+  - type: Deprecation
+    url: https://docs.zenoss.io/admin/updates/deprecation.html
+  - type: ChangeLog
+    url: https://docs.zenoss.io/admin/updates/cloud-updates.html
+  - type: ChangeLog
+    url: changelog/zenoss-changelog.yml
+  - type: Lifecycle
+    url: lifecycle/zenoss-lifecycle.yml
+  - type: Vocabulary
+    url: https://docs.zenoss.io/glossary/glossary.html
+  - type: TrustCenter
+    url: https://www.virtana.com/trust/
+  - type: Compliance
+    url: security/zenoss-trust-center.yml
+  - type: Conformance
+    url: conformance/zenoss-conformance.yml
+  - type: Packages
+    url: packages/zenoss-packages.yml
+  - type: SDKs
+    url: packages/zenoss-packages.yml
+  - type: Authentication
+    url: authentication/zenoss-authentication.yml
+  - type: Conventions
+    url: conventions/zenoss-conventions.yml
+  - type: ErrorCatalog
+    url: errors/zenoss-problem-types.yml
+  - type: DataModel
+    url: data-model/zenoss-data-model.yml
+  - type: Webhooks
+    url: asyncapi/zenoss-webhooks.yml
+  - type: Plans
+    url: plans/zenoss-plans-pricing.yml
+  - type: RateLimits
+    url: rate-limits/zenoss-rate-limits.yml
+  - type: FinOps
+    url: finops/zenoss-finops.yml
+  - type: DomainSecurity
+    url: security/zenoss-domain-security.yml
+  - type: AgentSkill
+    url: skills/_index.yml
+  - type: LLMsTxt
+    url: llms/zenoss-llms.txt
 maintainers:
   - FN: Kin Lane
     email: kin@apievangelist.com
+
+x-enrichment:
+  date: '2026-08-29'
+  status: enriched
+  artifacts_added: 22
+  pass: local-v1

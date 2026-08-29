@@ -1,0 +1,35 @@
+generated: '2026-08-29'
+method: generated
+source: >-
+  Authored from the published Virtana Service Observability API reference at docs.zenoss.io/api/ and
+  the first-party protobufs at github.com/zenoss/zenoss-protobufs. Every operation named in these
+  skills was read from the provider's own documentation; none is invented.
+provider: Zenoss
+providerId: zenoss
+description: >-
+  Packaged agent skills for the Virtana Service Observability (Zenoss Cloud) API. Zenoss publishes no
+  OpenAPI, so these are grounded in documented HTTP method + path pairs and in proto3 RPC names rather
+  than in operationIds.
+skills:
+  - name: zenoss-ingest-telemetry
+    file: zenoss-ingest-telemetry.md
+    summary: Push metrics, events and entity models through the data receiver, or via OTLP / gRPC.
+    operations: 6
+  - name: zenoss-triage-events
+    file: zenoss-triage-events.md
+    summary: Search, count and bucket events, then annotate and set status.
+    operations: 9
+  - name: zenoss-maintenance-windows
+    file: zenoss-maintenance-windows.md
+    summary: Create, verify, edit and bulk-delete maintenance windows over an entity query.
+    operations: 6
+  - name: zenoss-notification-actions
+    file: zenoss-notification-actions.md
+    summary: Wire triggers, destinations and rules, and test a destination before going live.
+    operations: 13
+provider_published_skills: none found
+notes:
+  - >-
+    Each skill repeats the two facts an agent most needs and the docs bury: there is no single base
+    URL (the endpoint is per-tenant, one of api.virtana.ai / api2 / api3 / api4), and there is no
+    idempotency key on any write.

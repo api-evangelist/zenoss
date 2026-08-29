@@ -1,0 +1,72 @@
+syntax = "proto3";
+
+package zenoss.cloud.collection_cfg;
+
+import "google/protobuf/struct.proto";
+
+option go_package = "github.com/zenoss/zenoss-protobufs/go/cloud/collection";
+option java_multiple_files = true;
+option java_package = "org.zenoss.cloud.collection";
+
+// CollectionConfigService is the gRPC & HTTP service responsible for managing
+// collection configurations.
+service CollectionConfigService {
+  rpc WaitForProbeConfig(stream WaitForProbeConfigResponse) returns (stream WaitForProbeConfigRequest) {}
+  rpc GetConfigStream(GetConfigStreamRequest) returns (stream GetConfigStreamResponse) {}
+}
+
+message Config {
+  string id = 1;
+  string name = 2;
+  string tenant = 3;
+  Configuration configuration = 5;
+  repeated string tags = 6;
+  string probe_type = 10;
+
+  reserved 4, 7, 8, 9;
+}
+
+message Configuration {
+  string type = 1;
+  string data = 2;
+}
+
+message ProbeSuccess {
+  google.protobuf.Struct data = 1;
+}
+
+message ProbeError {
+  // message is a short human-friendly text. Can be empty.
+  string message = 3;
+  // description is a parsed API error. Usually long and technical.
+  string description = 1;
+  repeated FieldError field_errors = 2;
+}
+
+message FieldError {
+  string field = 1;
+  string description = 2;
+}
+
+message ProbeResult {
+  oneof result {
+    ProbeSuccess success = 1;
+    ProbeError error = 2;
+  }
+}
+
+message WaitForProbeConfigRequest {
+  Config configuration = 1;
+  int64 deadline = 2;
+}
+
+message WaitForProbeConfigResponse {
+  string config_id = 1;
+  ProbeResult result = 2;
+}
+
+message GetConfigStreamRequest {}
+
+message GetConfigStreamResponse {
+  repeated Config configuration = 1;
+}

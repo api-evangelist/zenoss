@@ -1,0 +1,239 @@
+generated: '2026-08-29'
+method: derived
+source: grpc/zenoss-data-receiver.proto, grpc/zenoss-data-registry.proto, and the published /v1 API reference
+docs:
+  - https://docs.zenoss.io/api/receiver/data-receiver.html
+  - https://docs.zenoss.io/api/model-mgmt/entities.html
+  - https://docs.zenoss.io/api/event-mgmt/event-query.html
+  - https://docs.zenoss.io/dictionary/dictionary-overview.html
+provider: Zenoss
+providerId: zenoss
+description: >-
+  Entity graph for the Virtana Service Observability data core, derived from the first-party protobuf
+  messages and the documented REST resources. Zenoss has no OpenAPI, so relationships are read from
+  proto field types and from the identifier fields named in the API reference — not inferred from
+  naming alone. The organising idea of the model is the DIMENSION MAP: metrics, events and models all
+  carry a map<string,string> of dimensions, and it is the dimension set — not a surrogate ID — that
+  binds telemetry to the entity it describes.
+entities:
+  - name: Model
+    aka: Entity
+    description: >-
+      A monitored thing — device, VM, container, service, interface. Created or updated by
+      POST /v1/data-receiver/models (gRPC PutModels/PutModel) and queried through the model context
+      service.
+    identity: dimensions (map<string,string>); a schema/type ID and entity fields are read via the model context API
+    fields:
+      - timestamp
+      - dimensions
+      - metadataFields
+    operations:
+      - POST /v1/data-receiver/models
+      - POST /v1/modelcontext/entities:search
+      - POST /v1/modelcontext/fields:listDefault
+    relationships:
+      - has_many: Metric
+        via: dimensions
+      - has_many: Event
+        via: dimensions
+      - has_many: MaintenanceWindow
+        via: entity query
+      - has_one: ProductionState
+        via: model context custom properties
+  - name: Metric
+    description: >-
+      A named measurement with a timestamp and value, carried in three wire shapes — Metric
+      (dimensions + metadata), TaggedMetric (tags) and CompactMetric (pre-registered id).
+    identity: metric name + dimensions, or a registered id for CompactMetric
+    fields:
+      - metric
+      - timestamp
+      - value
+      - dimensions
+      - metadataFields
+    operations:
+      - POST /v1/data-receiver/metrics
+      - gRPC PutMetrics / PutMetric / MetricBatch
+    relationships:
+      - belongs_to: Model
+        via: dimensions
+      - has_one: MetricDictionaryEntry
+        via: metric name
+  - name: Event
+    description: >-
+      A discrete occurrence with severity, status, summary and body, ingested through the data
+      receiver and read through the event query service.
+    identity: id (opaque, e.g. AAAABg6X6wV4Sv-3-zQ7kcxJaqg=)
+    fields:
+      - id
+      - name
+      - timestamp
+      - dimensions
+      - type
+      - summary
+      - body
+      - severity
+      - status
+      - source
+    operations:
+      - POST /v1/data-receiver/events
+      - POST /v1/events:search
+      - GET /v1/events/{id}
+      - POST /v1/events:count
+      - POST /v1/events:frequency
+    relationships:
+      - belongs_to: Model
+        via: dimensions
+      - has_many: Annotation
+        via: event id
+      - has_one: EventFieldDictionaryEntry
+        via: field name
+  - name: Annotation
+    description: A note attached to one or more events by the event management service.
+    operations:
+      - POST /v1/event-management/annotate
+      - POST /v1/event-management/annotate-common
+      - POST /v1/event-management/delete-annotations
+    relationships:
+      - belongs_to: Event
+        via: event id
+  - name: DictionaryEntry
+    description: >-
+      A definition overriding or extending the default metric, entity-field or event-field
+      dictionary. Three sibling collections with identical CRUD shapes.
+    identity: name
+    operations:
+      - POST|GET|PATCH|DELETE /v1/dictionary/metrics[/{name}]
+      - POST /v1/dictionary/metrics:batchGet
+      - POST|GET|PATCH|DELETE /v1/dictionary/entity_fields[/{name}]
+      - POST|GET|PATCH|DELETE /v1/dictionary/event_fields[/{name}]
+    relationships:
+      - has_many: Metric
+        via: metric name
+  - name: MaintenanceWindow
+    description: >-
+      A scheduled suppression window bound to entities by an entity query, with lifecycle states
+      including In Progress, Completed and Partially Completed.
+    identity: id (returned on creation, used for bulk delete)
+    operations:
+      - POST /v1/modelcontext/maintwindows
+      - PUT /v1/modelcontext/maintwindows
+      - POST /v1/modelcontext/maintwindows:list
+      - POST /v1/modelcontext/maintwindows:search
+      - POST /v1/modelcontext/maintwindows:deleteBulk
+    fields:
+      - id
+      - name
+      - createdBy
+      - updatedBy
+      - deleted
+    relationships:
+      - has_many: Model
+        via: entity query
+  - name: Trigger
+    description: A condition over events, metrics, anomalies, maintenance state or stale data, expressed as a clause tree.
+    identity: name
+    operations:
+      - POST|GET|PUT|DELETE /v1/notification/triggers[/{name}]
+    relationships:
+      - has_many: Rule
+        via: trigger_names
+  - name: Rule
+    description: Binds triggers to destinations with a message template, enabled flag and repeat interval.
+    identity: name
+    operations:
+      - POST|GET|PUT|DELETE /v1/notification/rules[/{name}]
+    fields:
+      - name
+      - trigger_names
+      - destination_names
+      - message
+      - enabled
+      - repeat_interval
+    relationships:
+      - has_many: Trigger
+        via: trigger_names
+      - has_many: Destination
+        via: destination_names
+  - name: Destination
+    description: >-
+      An outbound notification target — webhook, Slack, Microsoft 365 connector card, PagerDuty, Zoom.
+    identity: name
+    operations:
+      - POST|GET|PUT|DELETE /v1/notification/destinations[/{name}]
+      - POST /v1/notification/destinations:test
+    relationships:
+      - belongs_to: Rule
+        via: destination_names
+      - has_one: Credential
+        via: credential reference
+  - name: Credential
+    description: >-
+      A stored secret for an inbound collector or outbound connector — API key, password, Kubernetes
+      service account, ServiceNow OAuth, Slack, Zoom, Microsoft 365, PagerDuty.
+    identity: id
+    operations:
+      - POST /v1/credentials
+      - GET /v1/credentials
+      - PUT /v1/credentials/{id}
+      - DELETE /v1/credentials/{id}
+      - gRPC CredentialManagement.GetCredential
+    relationships:
+      - has_many: Destination
+        via: credential reference
+  - name: User
+    description: A platform user account managed by the native identity manager.
+    identity: id
+    fields:
+      - id
+      - email
+      - firstName
+      - lastName
+      - groups
+      - createdAt
+      - createdBy
+      - updatedAt
+    operations:
+      - POST /v1/user-mgmt/end-user-accounts
+      - GET /v1/user-mgmt/end-user-accounts/{user-ID}
+      - PUT /v1/user-mgmt/end-user-accounts/{user-ID}
+      - DELETE /v1/user-mgmt/end-user-accounts/{user-ID}
+      - POST /v1/user-mgmt/end-user-account-ids
+    relationships:
+      - has_many: Group
+        via: groups
+  - name: Group
+    description: A role-bearing collection of users; an account needs at least one group before it can log in.
+    operations:
+      - /v1/user-mgmt/groups
+    relationships:
+      - has_many: User
+        via: groups
+  - name: APIClient
+    description: >-
+      A named container for authentication keys, typed User Management / User / Streaming Data
+      Ingest, holding up to 200 keys. Managed in the console, not through the API.
+    relationships:
+      - has_many: AuthenticationKey
+        via: API Client
+identifier_conventions:
+  - >-
+    Events use opaque base64 identifiers (AAAABg6X6wV4Sv-3-zQ7kcxJaqg=); no type prefix scheme is
+    published for any resource.
+  - >-
+    Dictionary entries, triggers, rules and destinations are addressed by NAME in the path, not by a
+    surrogate id — renaming is therefore not a supported update (the docs record a 400 for
+    "spec name update not allowed").
+  - >-
+    Telemetry is joined to entities by matching the dimension map, so dimension naming discipline is
+    the de facto foreign key of the whole model.
+coverage:
+  entities: 13
+  derived_from:
+    - grpc/zenoss-data-receiver.proto
+    - grpc/zenoss-data-registry.proto
+    - grpc/zenoss-credentials.proto
+    - published /v1 REST reference pages
+  caveat: >-
+    Field lists are partial. Without an OpenAPI or a published JSON Schema, only fields named in the
+    protobufs or shown in the reference's example payloads are recorded; nothing is inferred.

@@ -1,0 +1,106 @@
+generated: '2026-08-29'
+method: derived
+source: >-
+  Derived from the documented /v1 REST resources at https://docs.zenoss.io/api/zenoss-api.html after a
+  search for a published Zenoss/Virtana MCP server found no endpoint, package or install instruction.
+provider: Zenoss
+providerId: zenoss
+status: candidate
+description: >-
+  Candidate MCP tool surface for the Virtana Service Observability API. Zenoss/Virtana ships no MCP
+  server that an agent can reach today. The Virtana marketing navigation lists an "MCP Server"
+  capability ("Coordinate and operate AI workloads as a system", linking to
+  /platform/platform-architecture#mcp-server), but no endpoint URL, package, install command,
+  authentication description or documentation page accompanies it, and the documentation site has no
+  MCP section at all. The tools below are DERIVED from real documented REST operations so the shape of
+  a future server is recorded — they are not a server that exists.
+deployment:
+  mode: none
+  endpoint: null
+  install: null
+  package: null
+  auth: unknown
+  verified: searched
+  note: >-
+    Probes: https://mcp.virtana.com/mcp did not resolve (no response), https://www.virtana.com/mcp
+    returned 404, and no /.well-known/* discovery document is served on any Zenoss/Virtana host. No
+    endpoint is invented here.
+marketing_claim:
+  text: 'MCP Server — Coordinate and operate AI workloads as a system.'
+  url: https://www.virtana.com/platform/platform-architecture#mcp-server
+  observed: '2026-08-29'
+  substantiated: false
+  note: >-
+    A navigation entry on the product site. It describes an MCP capability the platform is said to
+    provide for observing/operating AI workloads; it does not publish an MCP server for third-party
+    agents to call, and nothing in the customer documentation describes one.
+candidate_tools:
+  - name: search_events
+    rest: POST /v1/events:search
+    description: Search events by filter, time range, severity and cursor pagination.
+  - name: get_event
+    rest: GET /v1/events/{id}
+    description: Fetch one event by id.
+  - name: count_events
+    rest: POST /v1/events:count
+    description: Count events matching a clause query.
+  - name: event_frequency
+    rest: POST /v1/events:frequency
+    description: Bucket event frequency over a time range.
+  - name: annotate_event
+    rest: POST /v1/event-management/annotate
+    description: Attach an annotation to events.
+  - name: set_event_status
+    rest: POST /v1/event-management/status
+    description: Set event status (acknowledge, close, suppress).
+  - name: search_entities
+    rest: POST /v1/modelcontext/entities:search
+    description: Search monitored entities by field query.
+  - name: list_entity_fields
+    rest: POST /v1/modelcontext/fields:listDefault
+    description: List default entity fields and their sources.
+  - name: list_maintenance_windows
+    rest: POST /v1/modelcontext/maintwindows:list
+    description: List maintenance windows for the tenant.
+  - name: create_maintenance_window
+    rest: POST /v1/modelcontext/maintwindows
+    description: Create a maintenance window over an entity query.
+  - name: delete_maintenance_windows
+    rest: POST /v1/modelcontext/maintwindows:deleteBulk
+    description: Delete maintenance windows by id.
+  - name: put_metrics
+    rest: POST /v1/data-receiver/metrics
+    description: Ingest metric data points.
+  - name: put_events
+    rest: POST /v1/data-receiver/events
+    description: Ingest events.
+  - name: put_models
+    rest: POST /v1/data-receiver/models
+    description: Create or update entity models.
+  - name: list_metric_dictionary
+    rest: GET /v1/dictionary/metrics
+    description: Read metric dictionary definitions.
+  - name: upsert_metric_dictionary_entry
+    rest: POST /v1/dictionary/metrics | PATCH /v1/dictionary/metrics/{name}
+    description: Create or update a custom metric definition.
+  - name: list_notification_rules
+    rest: GET /v1/notification/rules
+    description: List Actions rules.
+  - name: manage_notification_trigger
+    rest: POST|PUT|DELETE /v1/notification/triggers[/{name}]
+    description: Create, update or delete an Actions trigger.
+  - name: test_destination
+    rest: POST /v1/notification/destinations:test
+    description: Send a test notification to a destination — the only documented dry-run affordance.
+  - name: list_credentials
+    rest: GET /v1/credentials
+    description: List stored connector credentials.
+candidate_tool_count: 20
+blockers:
+  - >-
+    No OpenAPI document exists, so a generated server would have to hand-write every input schema
+    from prose. The protobufs cover only the data receiver, data registry, credentials and collection
+    config services — not events, model context, dictionary, actions or user management.
+  - >-
+    There is no single base URL. Each tenant is assigned one of api.virtana.ai / api2 / api3 / api4,
+    so any MCP server must take the endpoint as configuration.

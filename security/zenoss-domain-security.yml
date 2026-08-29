@@ -1,4 +1,4 @@
-generated: '2026-07-11'
+generated: '2026-08-29'
 method: probed
 source: live DNS/TLS/HTTP probes of apis.yml + OpenAPI hosts
 hosts:
@@ -8,6 +8,16 @@ hosts:
   cert_expires: Oct  1 06:51:00 2026 GMT
   hsts: true
   hsts_max_age: 7776000
+- host: docs.zenoss.io
+  https: true
+  tls_version: TLSv1.3
+  cert_expires: Dec  1 23:59:59 2026 GMT
+  hsts: false
+- host: api.virtana.ai
+  https: true
+  tls_version: TLSv1.3
+  cert_expires: Nov 18 16:24:04 2026 GMT
+  hsts: false
 domains:
 - domain: zenoss.com
   dnssec: false
@@ -15,3 +25,9 @@ domains:
   spf: true
   dmarc: true
   dmarc_policy: reject
+- domain: zenoss.io
+  dnssec: false
+  caa: []
+  spf: true
+  dmarc: true
+  dmarc_policy: quarantine

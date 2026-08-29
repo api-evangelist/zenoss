@@ -1,0 +1,145 @@
+generated: '2026-08-29'
+method: searched
+source: https://docs.zenoss.io/streaming/open-telemetry.html
+docs:
+  - https://docs.zenoss.io/streaming/open-telemetry.html
+  - https://www.virtana.com/trust/
+  - https://github.com/zenoss/zenoss-protobufs
+  - https://docs.zenoss.io/api/zenoss-api.html
+provider: Zenoss
+providerId: zenoss
+description: >-
+  Cross-cutting and domain standards asserted by the Zenoss / Virtana Service Observability contract
+  and documentation. Each entry records whether the provider conforms and the exact evidence that
+  supports it. Absence of a standard is recorded as conforms: false rather than omitted.
+standards:
+  - id: opentelemetry-otlp
+    name: OpenTelemetry Protocol (OTLP)
+    domain_standard: true
+    conforms: true
+    evidence: >-
+      The documentation publishes a first-class OTLP ingestion path: "Exporting OpenTelemetry metrics
+      into Virtana Service Observability uses the standard OpenTelemetry Protocol (OTLP)", with an
+      exporter type of OTLP, endpoint https://api.zenoss.io:443 and header
+      zenoss-api-key=YOUR-ZENOSS-API-KEY, plus a worked otelcol-contrib collector configuration for
+      sum, gauge and histogram metrics.
+    source: https://docs.zenoss.io/streaming/open-telemetry.html
+    note: >-
+      This is the domain standard for the observability market. A team already exporting OTLP can
+      point its existing collector at Zenoss with a config change and no bespoke connector — the
+      distinction this check exists to draw.
+  - id: grpc
+    name: gRPC
+    conforms: true
+    evidence: >-
+      DataReceiverService, DataRegistryService, CredentialManagement and CollectionConfigService are
+      defined as proto3 gRPC services in github.com/zenoss/zenoss-protobufs, including client-streaming
+      (PutEvent, PutMetric, PutModel) and bidirectional streaming (WaitForProbeConfig) RPCs.
+    source: grpc/zenoss-data-receiver.proto
+  - id: protobuf
+    name: Protocol Buffers (proto3)
+    conforms: true
+    evidence: >-
+      All four service contracts are published as proto3 files with go_package and java_package
+      options and a buf.yaml/buf.gen.yaml build, released as Go module v1.5.5 on 2026-07-27.
+    source: https://github.com/zenoss/zenoss-protobufs
+  - id: google-api-http-mapping
+    name: google.api.http / Google AIP resource conventions
+    conforms: true
+    evidence: >-
+      RPCs carry option (google.api.http) annotations binding them to REST paths
+      (post: "/v1/data-receiver/metrics", get: "/v1/credentials/{id}"), and the REST surface uses AIP
+      custom-method colon suffixes (:search, :count, :batchGet, :deleteBulk, :test).
+    source: grpc/zenoss-data-receiver.proto
+  - id: oidc
+    name: OpenID Connect
+    conforms: partial
+    evidence: >-
+      "The Virtana Platform provides LDAP, SAML, and OIDC support for single sign-on" — for
+      interactive platform sign-in only. The API itself authenticates with a static
+      zenoss-api-key header, and no /.well-known/openid-configuration is served on any host probed.
+    source: https://www.virtana.com/trust/
+  - id: saml
+    name: SAML 2.0
+    conforms: partial
+    evidence: Listed alongside LDAP and OIDC as a supported SSO protocol for platform sign-in.
+    source: https://www.virtana.com/trust/
+  - id: oauth2
+    name: OAuth 2.0
+    conforms: false
+    evidence: >-
+      No OAuth flow, authorization server, token endpoint or scope reference exists on the API
+      surface; all API access is by long-lived key. ServiceNow OAuth appears only as an outbound
+      connector credential type.
+    source: https://docs.zenoss.io/api/zenoss-api.html
+  - id: rfc9457
+    name: RFC 9457 Problem Details for HTTP APIs
+    conforms: false
+    evidence: >-
+      Errors return a gRPC-shaped {"code": <int>, "message": <string>} body, not
+      application/problem+json.
+    source: errors/zenoss-problem-types.yml
+  - id: pagination
+    name: Cursor pagination
+    conforms: true
+    evidence: >-
+      Search resources accept pageInput.pageSize / cursor / direction and return
+      pageInfo{count,totalCount,hasNext,startCursor,endCursor}; the credentials service uses a
+      nextPageToken instead.
+    source: https://docs.zenoss.io/api/event-mgmt/event-query.html
+  - id: idempotency
+    name: Idempotency keys
+    conforms: false
+    evidence: No idempotency header or replay-safety guarantee is documented on any write endpoint.
+    source: conventions/zenoss-conventions.yml
+  - id: openapi
+    name: OpenAPI
+    conforms: false
+    evidence: >-
+      No OpenAPI or Swagger document is served from any Zenoss/Virtana host. /openapi.json,
+      /openapi.yaml, /swagger.json, /v1/openapi.json, /api-docs, /docs and /redoc all 404 on
+      api.virtana.ai and on docs.zenoss.io. The REST surface is documented in prose only; the
+      machine-readable contract that does exist is the protobuf set.
+    source: https://api.virtana.ai/openapi.json
+  - id: soc2-type2
+    name: SOC 2 Type II
+    conforms: true
+    evidence: '"Virtana is SOC 2 Type II compliant. A copy of the report is available upon request."'
+    source: https://www.virtana.com/trust/
+  - id: csa-ccm-star
+    name: CSA Cloud Controls Matrix / STAR Registry
+    conforms: true
+    evidence: >-
+      "Our information security program is aligned with the CSA Cloud Controls Matrix, and we are
+      listed on the STAR Registry."
+    source: https://www.virtana.com/trust/
+  - id: gdpr
+    name: GDPR
+    conforms: true
+    evidence: >-
+      "Virtana also maintains a privacy compliance program, which includes GDPR and CCPA." Data
+      residency is customer-selected across UK and US Central AWS regions.
+    source: https://www.virtana.com/trust/
+  - id: ccpa
+    name: CCPA
+    conforms: true
+    evidence: Named alongside GDPR in the published privacy compliance program.
+    source: https://www.virtana.com/trust/
+  - id: iso-27001
+    name: ISO/IEC 27001
+    conforms: false
+    evidence: Not claimed on the trust page; the named attestations are SOC 2 Type II and CSA STAR.
+    source: https://www.virtana.com/trust/
+  - id: fedramp
+    name: FedRAMP
+    conforms: false
+    evidence: Not claimed, despite a Public Sector industry vertical on the marketing site.
+    source: https://www.virtana.com/trust/
+domain_standard_summary:
+  market: IT infrastructure observability / AIOps
+  standard: OpenTelemetry (OTLP)
+  declared_in: documentation (streaming ingestion reference), with a concrete endpoint, exporter type and header
+  strength: >-
+    Ingestion-side conformance is documented and worked through end to end. It is documented rather
+    than declared inside a machine-readable contract, because no OpenAPI exists and the OTLP path is
+    not represented in the published protobufs.

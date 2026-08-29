@@ -1,0 +1,61 @@
+generated: '2026-08-29'
+method: searched
+source: https://docs.zenoss.io/admin/updates/2026.html
+provider: Zenoss
+providerId: zenoss
+description: >-
+  Dated product update notes for Virtana Service Observability (formerly Zenoss Cloud), published by
+  month in the documentation. A parallel set exists for the Collection Zone component. The notes cover
+  product and UI changes; API-surface changes are not called out separately, and there is no
+  API-specific changelog or version history.
+urls:
+  current_year: https://docs.zenoss.io/admin/updates/2026.html
+  latest: https://docs.zenoss.io/admin/updates/_latest.html
+  index: https://docs.zenoss.io/admin/updates/cloud-updates.html
+  collection_zone: https://docs.zenoss.io/cz/updates/2026.html
+  archive:
+    - https://docs.zenoss.io/admin/updates/2025.html
+    - https://docs.zenoss.io/admin/updates/2024.html
+    - https://docs.zenoss.io/admin/updates/2023.html
+    - https://docs.zenoss.io/admin/updates/2022.html
+    - https://docs.zenoss.io/admin/updates/2021.html
+    - https://docs.zenoss.io/admin/updates/2020.html
+    - https://docs.zenoss.io/admin/updates/2019.html
+scheme:
+  style: continuous-delivery, month-dated notes
+  api_version: v1 (unchanged across the published archive)
+  semver: false
+  rss: false
+  note: >-
+    Entries are grouped by month with no build or release number, so a consumer cannot pin to a
+    version. The API path version has stayed at /v1 for the whole 2019-2026 archive.
+entries:
+  - date: '2026-05'
+    breaking: false
+    additions: false
+    highlights:
+      - >-
+        Planned deprecation of the Collection Zone Maintenance Window feature postponed; existing CZ
+        maintenance windows remain fully supported and an updated retirement timeline will follow.
+  - date: '2026-04'
+    breaking: false
+    additions: true
+    highlights:
+      - >-
+        Maintenance Windows gained a "Partially Completed" state, surfaced on the Activity and
+        Timeline tabs, for windows that finished In Progress but could not be fully verified.
+      - Maintenance Window Timeline added Day and Week views alongside Month.
+      - Inventory sidebar reworked to a persistent Queries/Organizers panel.
+      - Inventory added a "Previous filter" control to step back through applied filters one at a time.
+      - Inventory column selection extended to all entity fields on new, saved and template views.
+  - date: '2026-03'
+    breaking: false
+    additions: true
+    highlights:
+      - Smart View added an "Explore more" toolbar action linking to Container Observability, Inventory or CZ by entity type.
+      - Inventory added a scheduled export feature that emails saved inventory views on a recurring schedule.
+recent_window: 2026-03 through 2026-05 (most recent months published as of 2026-08-29)
+gaps:
+  - No API changelog. Endpoint, field and response changes are not enumerated anywhere.
+  - No feed (RSS/Atom/JSON) for the update notes; the pages must be polled.
+  - No release identifiers, so a customer cannot state which build they are running.

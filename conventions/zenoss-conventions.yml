@@ -1,0 +1,235 @@
+generated: '2026-08-29'
+method: searched
+source: https://docs.zenoss.io/api/zenoss-api.html
+docs:
+  - https://docs.zenoss.io/api/zenoss-api.html
+  - https://docs.zenoss.io/api/event-mgmt/event-query.html
+  - https://docs.zenoss.io/api/model-mgmt/maintenance-windows.html
+  - https://docs.zenoss.io/api/dictionary/metric.html
+provider: Zenoss
+providerId: zenoss
+description: >-
+  Cross-cutting runtime semantics for the Virtana Service Observability API (formerly Zenoss Cloud API),
+  read from the published API reference and from the first-party protobuf definitions in
+  github.com/zenoss/zenoss-protobufs.
+transport:
+  protocol: HTTPS (REST/JSON) and gRPC over HTTP/2 for the data receiver and data registry services
+  content_type: application/json
+  json_required: true
+  note: >-
+    Every endpoint requires HTTPS, expects JSON in the request body when a body is required, and
+    returns a JSON response.
+authentication:
+  style: api-key-header
+  header: zenoss-api-key
+  detail: authentication/zenoss-authentication.yml
+endpoints:
+  style: >-
+    Regional. There is no single canonical base URL — each tenant is assigned an endpoint, shown in
+    the API address field of the ADMIN > API Clients page. Requests are documented against a
+    YOUR-API-ENDPOINT placeholder.
+  production:
+    - host: api.virtana.ai
+      region: Iowa (Production 1)
+    - host: api2.virtana.ai
+      region: Las Vegas (Production 2)
+    - host: api3.virtana.ai
+      region: Sydney (Production 3)
+    - host: api4.virtana.ai
+      region: Frankfurt (Production 4)
+  preview:
+    - host: api-zing-preview.virtana.ai
+      region: Iowa (Preview)
+  otlp: https://api.zenoss.io:443
+  source: https://docs.zenoss.io/api/zenoss-api.html
+versioning:
+  style: path
+  current: v1
+  pattern: /v1/<service>/<resource>
+  note: >-
+    Every documented resource sits under /v1. No date-based or header-based version negotiation is
+    documented, and no /v2 surface exists.
+resource_naming:
+  style: google-aip-custom-methods
+  detail: >-
+    Collection resources use plain REST verbs (GET/POST/PUT/PATCH/DELETE), and non-CRUD operations
+    use the Google AIP custom-method colon suffix — :search, :count, :frequency, :batchGet,
+    :list, :listDefault, :deleteBulk, :test. This is consistent with the google.api.http annotations
+    carried in the zenoss-protobufs definitions.
+  examples:
+    - POST /v1/events:search
+    - POST /v1/events:count
+    - POST /v1/dictionary/metrics:batchGet
+    - POST /v1/modelcontext/entities:search
+    - POST /v1/modelcontext/maintwindows:deleteBulk
+    - POST /v1/notification/destinations:test
+pagination:
+  style: cursor
+  request_fields:
+    - name: pageInput.pageSize
+      description: Maximum number of results to return in one page.
+    - name: pageInput.cursor
+      description: >-
+        Cursor from a prior response's pageInfo.endCursor (forward) or pageInfo.startCursor (backward).
+    - name: pageInput.direction
+      description: DIRECTION_FORWARD (default) or DIRECTION_BACKWARD.
+  response_fields:
+    - pageInfo.count
+    - pageInfo.totalCount
+    - pageInfo.hasNext
+    - pageInfo.startCursor
+    - pageInfo.endCursor
+  alternates:
+    - field: nextPageToken
+      used_by: credentials service (GET /v1/credentials)
+      note: >-
+        The credentials service returns a nextPageToken rather than a pageInfo cursor block — the two
+        pagination shapes coexist across services.
+  source: https://docs.zenoss.io/api/event-mgmt/event-query.html
+filtering:
+  style: >-
+    Structured clause trees. Event, entity and trigger queries take a nested Clause object with
+    And/Or/Equals/Contains-style nodes rather than query-string filters, and the same clause grammar
+    is reused by Actions triggers.
+  source: https://docs.zenoss.io/actions/reference/trigger-queries.html
+field_selection:
+  supported: true
+  detail: >-
+    Event and entity search requests accept a fields[] array naming the fields to return, so a caller
+    controls response shape per request.
+error_envelope:
+  format: custom
+  rfc9457: false
+  shape:
+    code: integer — gRPC canonical status code carried through the JSON gateway (e.g. 3 for INVALID_ARGUMENT)
+    message: human-readable string
+  example: '{"code": 3, "message": "Group from the request doesn''t exist"}'
+  detail: errors/zenoss-problem-types.yml
+  note: >-
+    The envelope is the gRPC status shape, not application/problem+json. No type URI, no instance,
+    no trace identifier is documented.
+idempotency:
+  supported: false
+  header: null
+  note: >-
+    No Idempotency-Key header, request-id echo, or replay-safety guarantee is documented on any
+    endpoint. Data-receiver writes are additive appends; model writes are documented as
+    "create or update" upserts keyed on entity dimensions, which is idempotent in effect for models
+    but is not a published idempotency contract. No Idempotency pointer is emitted in apis.yml.
+request_tracing:
+  request_id_header: null
+  note: No request-id or correlation header is documented on requests or responses.
+rate_limit_signaling:
+  documented: false
+  headers: []
+  note: >-
+    No published quota, throttle threshold, X-RateLimit-*/RateLimit-* header, or 429 status appears
+    anywhere in the API reference. See rate-limits/zenoss-rate-limits.yml.
+bulk_and_streaming:
+  - name: Batch reads
+    detail: POST /v1/dictionary/metrics:batchGet accepts multiple names in one call.
+  - name: Bulk delete
+    detail: POST /v1/modelcontext/maintwindows:deleteBulk takes an array of IDs.
+  - name: gRPC streaming
+    detail: >-
+      DataReceiverService exposes client-streaming PutEvent, PutMetric and PutModel RPCs alongside
+      the unary PutEvents/PutMetrics/PutModels, and CollectionConfigService exposes bidirectional
+      streams. See grpc/.
+reversibility:
+  grade: documented
+  applicable: true
+  note: >-
+    The API has a substantial write surface and every documented destructive operation has a
+    counterpart create/update operation, so an agent can restore the prior configuration itself.
+    What is NOT published anywhere in the reference is a time window — no undo period, no soft-delete
+    retention, no restore-within-N-days statement — so this grades as documented rather than verified.
+    No window is asserted here because the provider states none.
+  surfaces:
+    - write: POST /v1/modelcontext/maintwindows
+      reversal: POST /v1/modelcontext/maintwindows:deleteBulk
+      window: null
+      note: >-
+        Delete is by ID, using the same IDs returned at creation. Records carry a `deleted` boolean in
+        list/search responses, but the docs do not state how long a deleted window remains readable.
+      source: https://docs.zenoss.io/api/model-mgmt/maintenance-windows.html
+    - write: POST /v1/dictionary/metrics (custom dictionary entry)
+      reversal: DELETE /v1/dictionary/metrics/{name}
+      window: null
+      note: >-
+        Deleting a custom entry removes the override; the documented purpose of custom entries is to
+        override default dictionary definitions, so removal returns the metric to its default definition.
+      source: https://docs.zenoss.io/api/dictionary/metric.html
+    - write: POST /v1/event-management/annotate
+      reversal: POST /v1/event-management/delete-annotations
+      window: null
+      source: https://docs.zenoss.io/api/event-mgmt/event-management.html
+    - write: POST /v1/event-management/status
+      reversal: POST /v1/event-management/status (set the prior status again)
+      window: null
+      note: Event status is a mutable field, so a status change is reversible by re-setting it.
+      source: https://docs.zenoss.io/api/event-mgmt/event-management.html
+    - write: POST /v1/credentials
+      reversal: DELETE /v1/credentials/{id}
+      window: null
+      source: https://docs.zenoss.io/api/credentials/credentials.html
+    - write: POST /v1/user-mgmt/end-user-accounts
+      reversal: DELETE /v1/user-mgmt/end-user-accounts/{user-ID}
+      window: null
+      note: >-
+        A softer reversal is documented for login specifically — setting groups to an empty array
+        prevents a user from logging in without deleting the account.
+      source: https://docs.zenoss.io/api/user-mgmt/users.html
+    - write: POST /v1/data-receiver/metrics | /events | /models
+      reversal: null
+      window: null
+      note: >-
+        Ingested telemetry has no documented delete or retraction path. Data written to the receiver
+        is not reversible through the API.
+      source: https://docs.zenoss.io/api/receiver/data-receiver.html
+  propagation:
+    - action: delete an API key or API Client
+      effect: clients using the key are denied access within 60 seconds
+      source: https://docs.zenoss.io/admin/clients/zenoss-api.html
+    - action: remove a user account managed by an external identity manager (e.g. LDAP)
+      effect: access denied within 10 hours
+      source: https://docs.zenoss.io/admin/clients/cz-api.html
+dry_run_mode:
+  supported: partial
+  note: >-
+    POST /v1/notification/destinations:test sends a test message to a configured destination without
+    waiting for a real trigger. No general dry-run or validate-only flag exists on write endpoints.
+  source: https://docs.zenoss.io/api/actions/actions.html
+legacy_router_api:
+  name: Zenoss API for Collection Zone and Resource Manager
+  style: JSON-RPC-like ExtDirect router calls, not REST
+  transport: HTTP POST, Content-Type application/json
+  path: /zport/dmd/<router>   # Collection Zone hosts prefix with /cz0
+  envelope:
+    action: router class name, e.g. DeviceRouter
+    method: method name, e.g. addDevice
+    data: array containing one argument object
+    tid: caller-supplied transaction id
+  example: '{"action": "DeviceRouter", "method": "addDevice", "data": [{"deviceName": "device.example.com", "deviceClass": "/Server/Linux"}], "tid": 1}'
+  auth:
+    collection_zone: z-api-key header
+    resource_manager: HTTP Basic (-u "api-username:api-password")
+  router_count: 61
+  coexistence: >-
+    This surface predates the /v1 services and is still documented. Zenoss states that "as Zenoss
+    Cloud evolves, some Zenoss API for Collection Zone and Resource Manager functionality will be
+    replaced by Zenoss API services", so the two overlap and will continue to diverge.
+  docs: https://docs.zenoss.com/api/background.html
+  clients_documented:
+    - curl (https://docs.zenoss.com/api/how-to/use-curl.html)
+    - Python (https://docs.zenoss.com/api/how-to/use-python.html)
+    - PowerShell (https://docs.zenoss.com/api/how-to/use-powershell.html)
+    - Postman (https://docs.zenoss.com/api/how-to/use-postman.html) — a how-to, not a published collection
+  note: >-
+    The docs.zenoss.com sitemap advertises these pages under docs.zenoss.io hostnames, where every one
+    of them 404s. The pages are only reachable on docs.zenoss.com. Recorded as observed 2026-08-29.
+cross_links:
+  errors: errors/zenoss-problem-types.yml
+  lifecycle: lifecycle/zenoss-lifecycle.yml
+  authentication: authentication/zenoss-authentication.yml
+  rate_limits: rate-limits/zenoss-rate-limits.yml
+  data_model: data-model/zenoss-data-model.yml

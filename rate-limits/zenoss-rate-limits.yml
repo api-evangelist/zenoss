@@ -3,87 +3,60 @@ specificationVersion: '0.1'
 schema: https://raw.githubusercontent.com/api-evangelist/interface-research/main/schema/api-commons.yml#/$defs/RateLimits
 provider: Zenoss
 providerId: zenoss
+generated: '2026-08-29'
+method: searched
+source: https://docs.zenoss.io/api/zenoss-api.html
 created: '2026-05-04'
-# Provenance stamped 2026-08-11: this artifact was written by the API Evangelist
-# bulk sweep dated 2026-05-04, not harvested from the provider. See roadmap#35.
-method: generated
-modified: '2026-05-04'
+modified: '2026-08-29'
 tags:
   - AIOps
   - Monitoring
-  - Rate Limiting
-  - Quotas
-  - Throttling
-description: Machine-readable rate limit definitions for the Zenoss API surface. Captures per-tier quotas,
-  burst behavior, response signaling, and recovery semantics. Defaults are scaffold values to be replaced
-  with published provider limits.
+  - Observability
+description: >-
+  Zenoss / Virtana Service Observability documents no rate limits. Every /v1 API reference page was
+  read — data receiver, event query, event management, model context (entities and maintenance
+  windows), dictionary (metrics, entity fields, event fields), actions, credentials and user
+  management — and none publishes a quota, a throttle threshold, a burst allowance, a rate-limit
+  response header, or a 429 status code. The published status-code tables run 200/400/401/404/409/
+  500/501 with no 429 anywhere. The only numeric ceilings Zenoss publishes are on key management
+  (200 keys per API Client, 130 Collection Zone keys per user), which are not request limits.
+limit_count: 0
+limits: []
 headers:
-  limit: X-RateLimit-Limit
-  remaining: X-RateLimit-Remaining
-  reset: X-RateLimit-Reset
-  retryAfter: Retry-After
-  policy: RateLimit-Policy
+  limit: null
+  remaining: null
+  reset: null
+  retryAfter: null
+  policy: null
+  note: No rate-limit response header of any kind is documented.
 responseCodes:
-  throttled: 429
-  quotaExceeded: 429
-  serviceUnavailable: 503
-limits:
-  - tier: free
-    name: Free Tier Default
-    scope: api-key
-    metric: requests_per_minute
-    limit: 10
-    burst: 20
-    timeFrame: minute
-    applies:
-      - Zenoss
-  - tier: free
-    name: Free Tier Monthly Quota
-    scope: api-key
-    metric: requests_per_month
-    limit: 1000
-    timeFrame: month
-    applies:
-      - Zenoss
-  - tier: professional
-    name: Professional Tier Default
-    scope: api-key
-    metric: requests_per_minute
-    limit: 100
-    burst: 200
-    timeFrame: minute
-    applies:
-      - Zenoss
-  - tier: professional
-    name: Professional Tier Monthly Quota
-    scope: api-key
-    metric: requests_per_month
-    limit: 100000
-    timeFrame: month
-    applies:
-      - Zenoss
-  - tier: enterprise
-    name: Enterprise Negotiated Limit
-    scope: contract
-    metric: requests_per_minute
-    limit: 1000
-    burst: 5000
-    timeFrame: minute
-    applies:
-      - Zenoss
-policies:
-  - name: Backoff Strategy
-    description: Clients should implement exponential backoff with jitter, honoring the Retry-After header
-      when present.
-  - name: Burst Handling
-    description: Short bursts above the steady-state limit are tolerated up to the documented burst ceiling
-      before throttling engages.
-  - name: Quota Reset
-    description: Monthly quotas reset at the start of each calendar month in UTC. Per-minute and per-second
-      windows reset on a sliding-window basis.
-  - name: Fair Use
-    description: Even on uncapped enterprise tiers, sustained usage that materially impacts shared infrastructure
-      may be subject to fair-use throttling.
-maintainers:
-  - FN: Kin Lane
-    email: kin@apievangelist.com
+  throttled: null
+  quotaExceeded: null
+  note: >-
+    429 does not appear in any published status-code table. Whether the platform throttles in
+    practice is not observable without a tenant key.
+related_ceilings:
+  - name: Keys per API Client
+    limit: 200
+    scope: api-client
+    source: https://docs.zenoss.io/admin/clients/zenoss-api.html
+  - name: Collection Zone keys per user
+    limit: 130
+    scope: user
+    source: https://docs.zenoss.io/admin/clients/cz-api.html
+  - name: Key revocation propagation
+    limit: 60 seconds
+    scope: api-client
+    note: Clients using a deleted key are denied access within 60 seconds — a propagation window, not a rate limit.
+    source: https://docs.zenoss.io/admin/clients/zenoss-api.html
+evidence:
+  - url: https://docs.zenoss.io/api/zenoss-api.html
+    status: 200
+  - url: https://docs.zenoss.io/api/receiver/data-receiver.html
+    status: 200
+  - url: https://docs.zenoss.io/api/event-mgmt/event-query.html
+    status: 200
+history: >-
+  This file replaces a 2026-05-04 bulk-sweep scaffold that asserted per-tier X-RateLimit-* headers,
+  429 handling and per-minute request limits. None of those were published by Zenoss; they have been
+  removed rather than carried forward.

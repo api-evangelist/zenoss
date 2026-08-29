@@ -1,0 +1,88 @@
+generated: '2026-08-29'
+method: searched
+source: https://github.com/zenoss + registry metadata endpoints (proxy.golang.org, registry.npmjs.org, pypi.org)
+provider: Zenoss
+providerId: zenoss
+description: >-
+  First-party client libraries and telemetry exporters published by Zenoss (now Virtana) for the
+  Virtana Service Observability API (formerly Zenoss Cloud API). The Go SDK and the protobuf module are
+  the currently maintained surfaces; the OpenCensus exporters have not shipped a release since 2020 and
+  OpenCensus itself has been superseded by OpenTelemetry, which the platform documents as the supported
+  ingestion path.
+packages:
+  - name: github.com/zenoss/zenoss-protobufs
+    registry: go
+    official: true
+    language: Go
+    version: v1.5.5
+    published: '2026-07-27'
+    url: https://pkg.go.dev/github.com/zenoss/zenoss-protobufs
+    repository: https://github.com/zenoss/zenoss-protobufs
+    description: >-
+      Protocol Buffer definitions and generated Go bindings for the Zenoss/Virtana cloud services —
+      data receiver, data registry, credential management and collection configuration.
+    note: Version and date read from https://proxy.golang.org/github.com/zenoss/zenoss-protobufs/@latest.
+  - name: github.com/zenoss/zenoss-go-sdk
+    registry: go
+    official: true
+    language: Go
+    version: v1.0.21
+    published: '2025-04-16'
+    url: https://pkg.go.dev/github.com/zenoss/zenoss-go-sdk
+    repository: https://github.com/zenoss/zenoss-go-sdk
+    description: Zenoss Go (Golang) SDK — endpoint client for streaming metrics, models and events into the data receiver.
+    note: Version and date read from https://proxy.golang.org/github.com/zenoss/zenoss-go-sdk/@latest.
+  - name: '@zenoss/opencensus-node-exporter'
+    registry: npm
+    official: true
+    language: JavaScript
+    version: 0.0.6
+    published: '2020-05-19'
+    url: https://www.npmjs.com/package/@zenoss/opencensus-node-exporter
+    repository: https://github.com/zenoss/opencensus-node-exporter
+    description: OpenCensus stats exporter for Zenoss (Node.js).
+    note: >-
+      Last published 2020-05-19. OpenCensus is archived upstream; the documented ingestion path for new
+      integrations is OpenTelemetry/OTLP (https://docs.zenoss.io/streaming/open-telemetry.html).
+  - name: opencensus-ext-zenoss
+    registry: pypi
+    official: true
+    language: Python
+    version: 0.0.4
+    published: '2020-05-19'
+    url: https://pypi.org/project/opencensus-ext-zenoss/
+    repository: https://github.com/zenoss/opencensus-python-exporter
+    description: OpenCensus Zenoss exporter for Python.
+    note: >-
+      Last published 2020-05-19. Same OpenCensus deprecation caveat as the Node exporter.
+  - name: github.com/zenoss/opencensus-go-exporter-zenoss
+    registry: go
+    official: true
+    language: Go
+    version: null
+    published: null
+    url: https://github.com/zenoss/opencensus-go-exporter-zenoss
+    repository: https://github.com/zenoss/opencensus-go-exporter-zenoss
+    description: OpenCensus stats exporter for Zenoss (Go).
+    note: >-
+      No module version answered on proxy.golang.org; the repository has not been pushed to since
+      2020-04-08. Checked, nothing to record.
+  - name: zenossapiclient
+    registry: pypi
+    official: false
+    language: Python
+    version: 0.2.7
+    published: '2020-04-10'
+    url: https://pypi.org/project/zenossapiclient/
+    repository: https://github.com/Zuora-TechOps/ZenossAPIClient
+    description: >-
+      Third-party Python client for the legacy Zenoss Resource Manager / Collection Zone JSON API.
+      Authored by Zuora-TechOps, not by Zenoss — listed for completeness, not as a first-party SDK.
+official_count: 5
+third_party_count: 1
+gaps:
+  - >-
+    No first-party Python, Java, JavaScript or .NET client for the current /v1 REST services
+    (data receiver, event query, model context, dictionary, actions, credentials, user management)
+    was found on any registry; the documented integration path for non-Go languages is raw HTTPS
+    with the zenoss-api-key header, or an OpenTelemetry collector.

@@ -1,0 +1,78 @@
+generated: '2026-08-29'
+method: searched
+source: https://www.virtana.com/trust/
+provider: Zenoss
+providerId: zenoss
+description: >-
+  Trust center for Zenoss, published by Virtana (which acquired Zenoss in May 2025) at
+  virtana.com/trust. It is a single narrative page rather than a hosted trust portal — there is no
+  document request portal, no subprocessor list, and no downloadable evidence pack — but it names
+  specific attestations and describes data residency, retention and access controls.
+url: https://www.virtana.com/trust/
+http_status: 200
+portal_vendor: none (self-hosted page)
+certifications:
+  - name: SOC 2 Type II
+    status: attested
+    evidence: '"Virtana is SOC 2 Type II compliant. A copy of the report is available upon request."'
+    report_available: on request
+  - name: CSA STAR Registry
+    status: listed
+    evidence: >-
+      "Our information security program is aligned with the CSA Cloud Controls Matrix, and we are
+      listed on the STAR Registry."
+compliance_programs:
+  - name: GDPR
+    evidence: '"Virtana also maintains a privacy compliance program, which includes GDPR and CCPA."'
+  - name: CCPA
+    evidence: Named alongside GDPR in the same statement.
+not_claimed:
+  - ISO/IEC 27001
+  - PCI DSS
+  - HIPAA
+  - FedRAMP
+  - ISO 27017 / 27018
+data_residency:
+  infrastructure: AWS
+  model: >-
+    Clients choose the region that contains their data, and the data stays within that region.
+  regions:
+    - Europe — United Kingdom
+    - North America — United States Central
+data_retention:
+  policy: >-
+    An active data retention policy retains or deletes data per applicable law. A departing customer
+    can access their data for up to 90 days unless otherwise requested; after 90 days Virtana
+    permanently deletes customer data.
+  customer_exit_window_days: 90
+access_controls:
+  encryption: Industry-standard algorithms, encrypted in transit and at rest.
+  mfa: Multi-factor authentication on all systems, for all access points, at all times.
+  logging: All data access is logged and monitored.
+  non_production_data: Development, test and QA data is anonymized and sanitized.
+  pen_testing: Penetration testing is performed against sanitized non-production environments.
+sso:
+  protocols:
+    - LDAP
+    - SAML
+    - OIDC
+  note: Supports external identity providers with redirect-back to the platform.
+vulnerability_disclosure:
+  published: false
+  note: >-
+    No security.txt on any host, no /security or /vulnerability-disclosure page, no bug bounty
+    program on HackerOne, Bugcrowd or Intigriti, and no security@ contact published anywhere on
+    virtana.com, zenoss.com or the documentation. There is no way for an outside researcher to report
+    a vulnerability except the general Contact Us form. No Security pointer is emitted in apis.yml
+    because there is nothing to point at.
+  probes:
+    - url: https://www.virtana.com/.well-known/security.txt
+      status: 404
+    - url: https://www.virtana.com/security.txt
+      status: 404
+    - url: https://docs.zenoss.io/.well-known/security.txt
+      status: 404
+    - url: https://api.virtana.ai/.well-known/security.txt
+      status: 404
+    - url: https://www.virtana.com/security/
+      status: 404

@@ -1,0 +1,110 @@
+generated: '2026-08-29'
+method: searched
+source: https://docs.zenoss.io/api/zenoss-api.html
+docs:
+  - https://docs.zenoss.io/api/user-mgmt/users.html
+  - https://docs.zenoss.io/api/dictionary/metric.html
+  - https://docs.zenoss.io/api/model-mgmt/maintenance-windows.html
+  - https://docs.zenoss.io/api/event-mgmt/event-query.html
+  - https://docs.zenoss.io/api/credentials/credentials.html
+provider: Zenoss
+providerId: zenoss
+format: custom
+rfc9457: false
+media_type: application/json
+envelope:
+  fields:
+    - name: code
+      type: integer
+      description: >-
+        gRPC canonical status code surfaced through the JSON gateway. Observed value 3
+        (INVALID_ARGUMENT) in the published user-management failure example.
+    - name: message
+      type: string
+      description: Human-readable explanation, e.g. "Group from the request doesn't exist".
+  example: '{"code": 3, "message": "Group from the request doesn''t exist"}'
+  note: >-
+    Zenoss publishes per-resource status-code tables rather than a central error reference, and the
+    failure body is the gRPC status shape, not application/problem+json. There is no type URI, no
+    machine-readable error slug, and no trace/request identifier for support correlation.
+description: >-
+  Error catalog for the Virtana Service Observability API, assembled from the status-code tables
+  published on each API reference page. Titles and meanings are quoted from the provider's own docs;
+  remediation is derived from the same pages and marked where it is inference rather than a quote.
+problem_types:
+  - status: 200
+    title: Success
+    meaning: >-
+      Request succeeded. Several resources document a 200 that still carries a partial failure —
+      "full or partial success; see response message" on the data receiver — so a 200 must be
+      inspected, not assumed.
+    remediation: Read the response body's status/failure counts before treating a 200 as complete.
+    seen_on:
+      - POST /v1/data-receiver/metrics
+      - POST /v1/data-receiver/events
+      - POST /v1/data-receiver/models
+  - status: 400
+    title: Bad request
+    meaning: >-
+      Invalid request parameters. Documented variants include "no name provided", "no metric names
+      requested", "search input was empty", "MW name was repeated", "no IDs provided", and
+      "spec name update not allowed".
+    remediation: Correct the request body; the message names the offending field or condition.
+    seen_on:
+      - POST /v1/user-mgmt/end-user-accounts
+      - POST /v1/dictionary/metrics
+      - POST /v1/events:search
+      - POST /v1/modelcontext/maintwindows
+  - status: 401
+    title: Unauthorized
+    meaning: Missing or invalid authentication key.
+    remediation: >-
+      Send a valid key in the zenoss-api-key header, and confirm the key's API Client type covers the
+      service being called — User Management, User, and Streaming Data Ingest keys grant different
+      services.
+    seen_on:
+      - all /v1 services
+  - status: 404
+    title: Not found
+    meaning: >-
+      No object exists for the requested identifier or name — "no custom entry exists with the
+      requested name", "no MW by provided ID".
+    remediation: Resolve the identifier with the matching search/list resource before retrying.
+    seen_on:
+      - GET /v1/dictionary/metrics/{name}
+      - GET /v1/user-mgmt/end-user-accounts/{user-ID}
+      - POST /v1/modelcontext/maintwindows:list
+  - status: 409
+    title: Conflict
+    meaning: A custom entry by the same name already exists.
+    remediation: >-
+      Use the update verb (PATCH /v1/dictionary/metrics/{name}) instead of create, or choose a
+      different name.
+    seen_on:
+      - POST /v1/dictionary/metrics
+      - POST /v1/dictionary/entity_fields
+      - POST /v1/dictionary/event_fields
+  - status: 500
+    title: Internal server error
+    meaning: >-
+      Server-side failure. Note that some published tables also list 500 with the text "missing or
+      invalid authentication key", overlapping the documented meaning of 401.
+    remediation: >-
+      Retry with backoff. Because no idempotency key exists, a retried write on a non-upsert resource
+      can duplicate — see conventions/zenoss-conventions.yml.
+    seen_on:
+      - POST /v1/modelcontext/entities:search
+      - POST /v1/events:search
+  - status: 501
+    title: Method not allowed
+    meaning: >-
+      Published as "501 (method not allowed)" on the maintenance windows resources — 501 is Not
+      Implemented in RFC 9110; 405 is Method Not Allowed. Recorded as published.
+    remediation: Use one of the documented verbs for the resource.
+    seen_on:
+      - /v1/modelcontext/maintwindows
+gaps:
+  - No central error reference page; codes are only discoverable per resource.
+  - No stable machine-readable error identifiers — a client must string-match on `message`.
+  - No 429 and no rate-limit error is documented anywhere in the reference.
+  - No Retry-After or retry guidance is published for 500-class responses.

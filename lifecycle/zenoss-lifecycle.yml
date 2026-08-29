@@ -1,0 +1,88 @@
+generated: '2026-08-29'
+method: searched
+source: https://docs.zenoss.io/admin/updates/deprecation.html
+provider: Zenoss
+providerId: zenoss
+description: >-
+  Versioning, deprecation, status and support posture for Virtana Service Observability (formerly
+  Zenoss Cloud). Zenoss publishes a standing deprecation-notices page and monthly update notes, and
+  runs a public status page — but publishes no numbered API versions, no sunset headers, and no SLA
+  document on the public web.
+versioning:
+  scheme: path
+  current: v1
+  since: at least 2019 (the earliest published update notes already describe /v1 resources)
+  parallel_versions: []
+  negotiation: none
+  note: No date-pinned versions, no version header, no /v2.
+deprecation:
+  policy_published: true
+  policy_url: https://docs.zenoss.io/admin/updates/deprecation.html
+  policy_summary: >-
+    A standing "Deprecation notices" page lists features scheduled for deprecation with their
+    recommended replacements. Deprecated features are no longer developed and remain usable until
+    retirement, which is announced with an effective date. The page carries an explicit caveat that
+    the notices describe future updates that may change.
+  headers:
+    rfc8594_sunset: false
+    deprecation_header: false
+    note: No Sunset or Deprecation response header is documented on any endpoint.
+  notices:
+    - feature: Collection Zone > Maintenance windows
+      announced: '2025-06'
+      effective: '2026-06-01'
+      status: postponed (2026-05) — existing CZ maintenance windows remain fully supported, new timeline TBA
+      replacement: Virtana Service Observability Maintenance Windows (/v1/modelcontext/maintwindows)
+    - feature: Collection Zone > Dashboards
+      announced: '2022-08'
+      effective: '2025-12-15'
+      status: retired
+      replacement: Virtana Service Observability > Dashboards
+    - feature: Collection Zone > Reports
+      announced: '2022-08'
+      effective: null
+      status: deprecated, still usable
+      replacement: Data Access option (export to Google Cloud or another data store)
+    - feature: Dashboards > Event Count tile and Event List tile
+      announced: '2023-01'
+      effective: '2023-01-31'
+      status: discontinued
+      replacement: Event List + Count tile
+  api_deprecations: >-
+    No API endpoint, field or parameter has been announced as deprecated. Every notice on the page
+    concerns product/UI features, several of them in the legacy Collection Zone.
+status_page:
+  published: true
+  url: https://status.zenoss.io/
+  name: Zenoss Cloud Status
+  subscriptions:
+    - email
+    - sms
+  history: Incident history published on the status page.
+  note: >-
+    Virtana also runs https://status.cloud.virtana.com/ for the wider platform; status.zenoss.io is
+    the one branded for this product line.
+sla:
+  published: false
+  url: null
+  note: >-
+    No public SLA, uptime target or credit schedule is published on virtana.com or in the docs;
+    terms are handled through the sales/contract path.
+support:
+  url: https://www.virtana.com/support/
+  help_center: https://support.zenoss.com/hc/en-us
+  note: >-
+    The Zendesk help center at support.zenoss.com returns 403 to unauthenticated crawlers and
+    requires a customer sign-in.
+environments:
+  - name: Production
+    hosts:
+      - api.virtana.ai
+      - api2.virtana.ai
+      - api3.virtana.ai
+      - api4.virtana.ai
+  - name: Preview
+    hosts:
+      - api-zing-preview.virtana.ai
+    note: Published in the API endpoint list as a preview environment; no self-serve access is documented.
+changelog: changelog/zenoss-changelog.yml

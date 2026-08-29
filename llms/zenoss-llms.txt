@@ -1,0 +1,122 @@
+# Zenoss (Virtana Service Observability)
+
+> AIOps and full-stack IT infrastructure observability. Zenoss was acquired by Virtana in May 2025
+> and is sold as Virtana Service Observability; zenoss.com now redirects to
+> virtana.com/service-observability. The developer surface is unchanged and still branded Zenoss:
+> a /v1 REST API, first-party proto3/gRPC contracts, and the long-standing JSON router API for
+> Collection Zones and on-premises Resource Manager.
+
+Generated 2026-08-29 by the API Evangelist enrichment pipeline from the provider's published
+documentation. Method: generated. No llms.txt is served by the provider — probes of
+https://docs.zenoss.io/llms.txt, https://www.virtana.com/llms.txt and https://api.virtana.ai/llms.txt
+all returned 404.
+
+## Start here
+
+- [API overview and endpoint list](https://docs.zenoss.io/api/zenoss-api.html): base URLs, the
+  zenoss-api-key header, and the eight /v1 services.
+- [Get started](https://docs.zenoss.io/start/get-started.html)
+- [Documentation home](https://docs.zenoss.io/)
+- [Glossary](https://docs.zenoss.io/glossary/glossary.html)
+
+## Authentication
+
+All /v1 services take a long-lived key in the `zenoss-api-key` request header. Keys are issued per
+API Client from ADMIN > API Clients in three types — User Management API, User API, and Streaming
+Data Ingest API — and the type decides which services the key can call. Keys cannot be retrieved
+after creation and do not expire; deleting a key denies access within 60 seconds. The legacy router
+API uses a differently named `z-api-key` header (Collection Zone) or HTTP Basic (Resource Manager).
+There is no OAuth 2.0 and no OpenID Connect on any API surface.
+
+- [API client keys](https://docs.zenoss.io/admin/clients/zenoss-api.html)
+- [Collection Zone keys](https://docs.zenoss.io/admin/clients/cz-api.html)
+
+## Endpoints
+
+There is no single base URL. Each tenant is assigned one of four production endpoints, shown in the
+API address field of the ADMIN > API Clients page:
+
+- api.virtana.ai (Iowa)
+- api2.virtana.ai (Las Vegas)
+- api3.virtana.ai (Sydney)
+- api4.virtana.ai (Frankfurt)
+- api-zing-preview.virtana.ai (preview)
+- api.zenoss.io:443 (OpenTelemetry OTLP metric export)
+
+## /v1 REST services
+
+- [Data receiver](https://docs.zenoss.io/api/receiver/data-receiver.html): POST /v1/data-receiver/metrics, /events, /models
+- [Event query](https://docs.zenoss.io/api/event-mgmt/event-query.html): POST /v1/events:search, :count, :frequency; GET /v1/events/{id}
+- [Event management](https://docs.zenoss.io/api/event-mgmt/event-management.html): annotate, annotate-common, delete-annotations, status, status-common
+- [Model context — entities](https://docs.zenoss.io/api/model-mgmt/entities.html): POST /v1/modelcontext/entities:search, fields:listDefault
+- [Model context — maintenance windows](https://docs.zenoss.io/api/model-mgmt/maintenance-windows.html): POST/PUT /v1/modelcontext/maintwindows, :list, :search, :deleteBulk
+- [Dictionary — metrics](https://docs.zenoss.io/api/dictionary/metric.html), [entity fields](https://docs.zenoss.io/api/dictionary/entity-fields.html), [event fields](https://docs.zenoss.io/api/dictionary/event-fields.html)
+- [Actions](https://docs.zenoss.io/api/actions/actions.html): /v1/notification/triggers, /rules, /destinations, destinations:test
+- [Credentials](https://docs.zenoss.io/api/credentials/credentials.html): /v1/credentials
+- [User management](https://docs.zenoss.io/api/user-mgmt/users.html): /v1/user-mgmt/end-user-accounts, /groups
+
+## Machine-readable contracts
+
+No OpenAPI or Swagger document is published — /openapi.json, /openapi.yaml, /swagger.json,
+/api-docs, /docs and /redoc all 404 on both the API host and the docs host. The contracts that DO
+exist are proto3:
+
+- [zenoss-protobufs](https://github.com/zenoss/zenoss-protobufs) — DataReceiverService,
+  DataRegistryService, CredentialManagement, CollectionConfigService. Go module v1.5.5 (2026-07-27).
+
+## Legacy router API
+
+[Zenoss API for Collection Zone and Resource Manager](https://docs.zenoss.com/api/background.html) —
+61 documented routers reached by HTTP POST to /zport/dmd/<router> with a
+{"action","method","data","tid"} envelope. Covers devices, events, event classes, triggers,
+templates, reports, jobs, users, LDAP, SAML IdP, licensing, ZenPacks, impact, and vendor surfaces
+(AWS, Azure, vSphere, Hyper-V, OpenStack, Cisco UCS, EMC Isilon, SMI-S). Zenoss states some of this
+will be replaced by the /v1 services over time.
+
+## Conventions
+
+- JSON over HTTPS. Non-CRUD operations use Google AIP colon suffixes — :search, :count, :batchGet,
+  :list, :deleteBulk, :test.
+- Cursor pagination: pageInput{pageSize,cursor,direction} in, pageInfo{count,totalCount,hasNext,
+  startCursor,endCursor} out. The credentials service uses nextPageToken instead.
+- Errors return {"code": <int>, "message": "<text>"} — the gRPC status shape, not RFC 9457.
+- No idempotency key on any write. No documented rate limits, no 429, no rate-limit headers.
+
+## Events out
+
+Actions rules deliver JSON to webhook, Slack, Microsoft 365, PagerDuty, ServiceNow, Zoom and email
+destinations. [Webhook payload example](https://docs.zenoss.io/actions/reference/webhook.html).
+No AsyncAPI, no webhook signature scheme, no documented retries.
+
+## OpenTelemetry
+
+[OTLP ingestion](https://docs.zenoss.io/streaming/open-telemetry.html) — exporter type OTLP,
+endpoint https://api.zenoss.io:443, header zenoss-api-key. Sum, gauge and histogram metrics.
+
+## SDKs
+
+- [zenoss-go-sdk](https://github.com/zenoss/zenoss-go-sdk) — Go, v1.0.21 (2025-04-16)
+- [zenoss-protobufs](https://github.com/zenoss/zenoss-protobufs) — Go, v1.5.5 (2026-07-27)
+- [@zenoss/opencensus-node-exporter](https://www.npmjs.com/package/@zenoss/opencensus-node-exporter) — 0.0.6 (2020-05-19), OpenCensus is superseded by OpenTelemetry
+- [opencensus-ext-zenoss](https://pypi.org/project/opencensus-ext-zenoss/) — 0.0.4 (2020-05-19)
+
+No first-party Python, Java, JavaScript or .NET client exists for the /v1 services.
+
+## Operations
+
+- [Status page](https://status.zenoss.io/)
+- [Deprecation notices](https://docs.zenoss.io/admin/updates/deprecation.html)
+- [Update notes](https://docs.zenoss.io/admin/updates/cloud-updates.html)
+- [Trust center](https://www.virtana.com/trust/) — SOC 2 Type II, CSA STAR, GDPR/CCPA
+- [Support](https://www.virtana.com/support/)
+
+## Commercial
+
+No public pricing. virtana.com/pricing returns 404 and the former zenoss.com/price redirects to the
+product page. The commercial path is a demo request or a sales conversation.
+
+## Not available
+
+No MCP server (the product site advertises an "MCP Server" capability but publishes no endpoint,
+package or documentation). No A2A agent card. No /.well-known documents on any host. No OpenAPI.
+No Postman collection. No published SLA. No vulnerability disclosure policy or security.txt.

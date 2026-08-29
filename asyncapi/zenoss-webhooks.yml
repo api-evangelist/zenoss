@@ -1,0 +1,102 @@
+generated: '2026-08-29'
+method: searched
+source: https://docs.zenoss.io/actions/reference/webhook.html
+docs:
+  - https://docs.zenoss.io/actions/reference/webhook.html
+  - https://docs.zenoss.io/actions/reference/destination-fields.html
+  - https://docs.zenoss.io/api/actions/actions.html
+  - https://docs.zenoss.io/actions/reference/trigger-queries.html
+provider: Zenoss
+providerId: zenoss
+type: Webhooks
+asyncapi_spec: null
+description: >-
+  Outbound event surface for Virtana Service Observability (formerly Zenoss Cloud). Zenoss does not
+  publish an AsyncAPI document, but it does ship a real, documented webhook delivery mechanism: the
+  Actions service evaluates triggers against events, metrics, anomalies, maintenance state and stale
+  data, and a rule fans matching notifications out to configured destinations — one of which is a
+  generic HTTP webhook with a published JSON payload example.
+model:
+  style: rule-driven notification fan-out
+  producer: Virtana Service Observability Actions service
+  subscription: >-
+    Destinations, triggers and rules are configured objects, managed through the console or through
+    /v1/notification/* — there is no per-subscription registration endpoint and no event-type catalog
+    to subscribe to. What you receive is defined by the trigger clause you write, not by a fixed list
+    of event names.
+  delivery: HTTP POST of a JSON document to the destination URL
+  retries: Not documented.
+  signing: >-
+    No signature header, shared secret, or replay-protection scheme is documented. Custom headers can
+    be set on a webhook destination, so a caller may add their own bearer token.
+  ordering: Not documented.
+  repeat_control: rule.repeat_interval (seconds) suppresses repeat notifications for the same rule.
+trigger_types:
+  - id: event
+    description: Clause query over event fields (severity, status, source, and any event field).
+    docs: https://docs.zenoss.io/actions/how-to/add-event-trigger.html
+  - id: metric
+    description: Threshold condition on a metric.
+    docs: https://docs.zenoss.io/actions/how-to/add-metric-trigger.html
+  - id: anomaly
+    description: Fires on detected anomalies.
+    docs: https://docs.zenoss.io/actions/how-to/add-anomaly-trigger.html
+  - id: maintenance
+    description: Fires on maintenance window state.
+    docs: https://docs.zenoss.io/actions/how-to/add-maintenance-trigger.html
+  - id: stale-data
+    description: Fires when expected data stops arriving.
+    docs: https://docs.zenoss.io/actions/how-to/add-stale-data-trigger.html
+destinations:
+  - id: webhook
+    description: 'Generic HTTP receiver. Fields: URL, Headers, Custom payload toggle, JSON payload.'
+    custom_payload: true
+  - id: slack
+    docs: https://docs.zenoss.io/actions/reference/slack-app.html
+  - id: microsoft-365
+    description: Office 365 connector card / Microsoft Teams incoming webhook URL.
+    docs: https://docs.zenoss.io/actions/reference/o365-connector-card.html
+  - id: pagerduty
+    description: Accepts the same JSON message format as a webhook destination.
+  - id: servicenow
+    description: ServiceNow ITOM instance, authenticated with OAuth credentials stored in the credentials service.
+  - id: email
+  - id: zoom
+payload:
+  content_type: application/json
+  documented_example: https://docs.zenoss.io/actions/reference/webhook.html
+  top_level_fields:
+    - name: id
+      description: Notification identifier (opaque base64).
+    - name: tenant
+      description: Tenant name.
+    - name: timestamp
+      description: Epoch milliseconds.
+    - name: rule
+      description: The rule that fired — name, trigger_names[], destination_names[], message, enabled, repeat_interval.
+    - name: trigger
+      description: >-
+        The trigger definition, including its full nested clause tree (And/Or/Equals over event
+        fields such as severity, status and source).
+    - name: event
+      description: >-
+        The matched event — summary, severity (integer), status (integer), and a fields map that
+        includes Zenoss internal keys such as _zen_clientid, _zen_direct_entity_id and _zen_entityIds.
+  note: >-
+    The payload embeds the whole trigger definition alongside the event, so a receiver gets the rule
+    that fired as well as the fact that fired it. Severity and status arrive as integers, not labels.
+  templating:
+    supported: true
+    docs: https://docs.zenoss.io/actions/reference/templates.html
+    default_messages: https://docs.zenoss.io/actions/reference/default-messages.html
+inbound_streaming:
+  note: >-
+    The inbound (ingest) side is genuinely streaming and is contract-backed, but by gRPC rather than
+    AsyncAPI — DataReceiverService exposes client-streaming PutEvent/PutMetric/PutModel and
+    CollectionConfigService exposes bidirectional config streams. See grpc/. OTLP metric export is
+    documented at https://api.zenoss.io:443.
+gaps:
+  - No AsyncAPI document is published for either the inbound or outbound event surface.
+  - No webhook signature or verification scheme, so a receiver cannot authenticate the sender.
+  - No documented retry, backoff or delivery-guarantee semantics.
+  - No catalog of event types; the shape of what you receive depends entirely on the trigger clause.
