@@ -149,6 +149,9 @@ apis:
       - type: Conventions
         url: conventions/zenoss-conventions.yml
 common:
+  - type: License
+    name: Apache-2.0
+    url: https://github.com/zenoss/zenoss-protobufs/blob/master/LICENSE
   - type: Website
     url: https://www.zenoss.com
   - type: Documentation
