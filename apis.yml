@@ -43,7 +43,6 @@ tags:
   - Monitoring
   - Observability
   - Infrastructure
-  - Event Management
   - Hybrid Cloud
   - OpenTelemetry
   - gRPC
@@ -230,3 +229,5 @@ x-enrichment:
   status: enriched
   artifacts_added: 22
   pass: local-v1
+x-tags-removed:
+- Event Management
