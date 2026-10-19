@@ -1,0 +1,127 @@
+edges:
+- partner_name: Go module proxy
+  partner: null
+  partner_match: null
+  type: register
+  direction: provider-built
+  category: official SDK (Go)
+  evidence: https://pkg.go.dev/github.com/zenoss/opencensus-go-exporter-zenoss
+  channel: package-registry
+  relationship: distribution-channel
+  contract_reference:
+    register: Go module proxy (public registry JSON)
+    spec_file: null
+    language: Go
+    packages:
+    - name: github.com/zenoss/opencensus-go-exporter-zenoss
+      version: v1.1.0
+      released: '2020-04-07'
+      released_field: Time
+      lapsed: true
+      page: https://pkg.go.dev/github.com/zenoss/opencensus-go-exporter-zenoss
+      repo_leg: github-org:zenoss
+      publisher_leg: org:zenoss
+      matched_by: github-org
+    - name: github.com/zenoss/zenoss-go-sdk
+      version: v1.0.21
+      released: '2025-04-16'
+      released_field: Time
+      lapsed: false
+      page: https://pkg.go.dev/github.com/zenoss/zenoss-go-sdk
+      repo_leg: github-org:zenoss
+      publisher_leg: org:zenoss
+      matched_by: github-org
+    - name: github.com/zenoss/zenoss-protobufs
+      version: v1.5.5
+      released: '2026-07-27'
+      released_field: Time
+      lapsed: false
+      page: https://pkg.go.dev/github.com/zenoss/zenoss-protobufs
+      repo_leg: github-org:zenoss
+      publisher_leg: org:zenoss
+      matched_by: github-org
+    current: true
+    signal_note: 'an official package on the registry: distribution, not an integration; lapsed = no release in
+      24 months'
+    detected_by: sweep-official-sdks.py
+    detected: '2026-10-18'
+  detected_by: sweep-official-sdks.py
+  first_seen: '2026-10-18'
+- partner_name: npm registry
+  partner: npm
+  partner_match: register
+  type: register
+  direction: provider-built
+  category: official SDK (JavaScript/TypeScript)
+  evidence: https://www.npmjs.com/package/@zenoss/opencensus-node-exporter
+  channel: package-registry
+  relationship: distribution-channel
+  contract_reference:
+    register: npm registry (public registry JSON)
+    spec_file: null
+    language: JavaScript/TypeScript
+    packages:
+    - name: '@zenoss/opencensus-node-exporter'
+      version: 0.0.6
+      released: '2022-04-11'
+      released_field: modified
+      lapsed: true
+      page: https://www.npmjs.com/package/@zenoss/opencensus-node-exporter
+      repo_leg: github-org:zenoss
+      publisher_leg: org:zenoss
+      matched_by: github-org
+    current: false
+    signal_note: 'an official package on the registry: distribution, not an integration; lapsed = no release in
+      24 months'
+    detected_by: sweep-official-sdks.py
+    detected: '2026-10-18'
+  detected_by: sweep-official-sdks.py
+  first_seen: '2026-10-18'
+- partner_name: PyPI
+  partner: pypi
+  partner_match: register
+  type: register
+  direction: provider-built
+  category: official SDK (Python)
+  evidence: https://pypi.org/project/opencensus-ext-zenoss/
+  channel: package-registry
+  relationship: distribution-channel
+  contract_reference:
+    register: PyPI (public registry JSON)
+    spec_file: null
+    language: Python
+    packages:
+    - name: opencensus-ext-zenoss
+      version: 0.0.4
+      released: '2020-05-19'
+      released_field: upload_time
+      lapsed: true
+      page: https://pypi.org/project/opencensus-ext-zenoss/
+      repo_leg: github-org:zenoss
+      publisher_leg: email:zenoss.com
+      matched_by: domain
+    current: false
+    signal_note: 'an official package on the registry: distribution, not an integration; lapsed = no release in
+      24 months'
+    detected_by: sweep-official-sdks.py
+    detected: '2026-10-18'
+  detected_by: sweep-official-sdks.py
+  first_seen: '2026-10-18'
+generated: '2026-10-18'
+method: searched
+source:
+- https://api.nuget.org/v3
+- https://crates.io/api/v1
+- https://proxy.golang.org
+- https://pypi.org/pypi
+- https://registry.npmjs.org
+- https://repo1.maven.org/maven2
+- https://rubygems.org/api/v1
+checked:
+- https://api.nuget.org/v3
+- https://crates.io/api/v1
+- https://proxy.golang.org
+- https://pypi.org/pypi
+- https://registry.npmjs.org
+- https://repo1.maven.org/maven2
+- https://rubygems.org/api/v1
