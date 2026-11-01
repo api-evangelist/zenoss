@@ -1,4 +1,4 @@
-# Zenoss (zenoss)
+# Zenoss
 
 <!-- API-EVANGELIST-PROVENANCE:BEGIN -->
 > ### About this repository
@@ -64,48 +64,130 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-Zenoss is an AIOps and full-stack monitoring platform for hybrid IT infrastructure observability and event management.
+Zenoss is an AIOps and full-stack IT infrastructure monitoring platform, acquired by Virtana in May 2025 and now sold as Virtana Service Observability. It ingests metrics, events and entity models from hybrid estates — VMware, Nutanix, Kubernetes, AWS, Azure, GCP, network and storage — through on-premises Collection Zones, streaming agents and OpenTelemetry/OTLP, then applies dependency mapping, event correlation and anomaly detection to turn raw signal into service impact. The developer surface is a versioned /v1 REST API covering data ingest, event query and management, entity/model context, maintenance windows, the metric dictionary, notification Actions, credentials and user management, plus first-party proto3/gRPC contracts for the data receiver and data registry. API clients authenticate with a long-lived key in the zenoss-api-key header, issued per API Client from the console, and each tenant is assigned one of four regional endpoints.
 
-**APIs.json:** [https://raw.githubusercontent.com/api-evangelist/zenoss/refs/heads/main/apis.yml](https://raw.githubusercontent.com/api-evangelist/zenoss/refs/heads/main/apis.yml)
+**Areas:** AIOps · Monitoring · Observability · Infrastructure · Hybrid Cloud · OpenTelemetry · gRPC · Metrics
 
-## Scope
+## Zenoss on APIs.io
 
-- **Type:** Index
+Everything profiled for Zenoss is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/zenoss/](https://apis.io/providers/zenoss/)** — or go straight to one of the APIs or properties below.
 
-## Tags
+### APIs (3)
 
-- AIOps
-- Monitoring
+- [Virtana Service Observability API](https://apis.io/apis/zenoss/zenoss/) — Versioned /v1 REST API for the Zenoss (Virtana Service Observability) platform. Covers the data receiver (metrics, events, entity models), event query and…
+- [Zenoss Cloud gRPC Services](https://apis.io/apis/zenoss/zenoss-grpc/) — First-party proto3 service contracts published at github.com/zenoss/zenoss-protobufs and released as a Go module (v1.5.5, 2026-07-27). DataReceiverService…
+- [Zenoss API for Collection Zone and Resource Manager](https://apis.io/apis/zenoss/zenoss-router-api/) — The long-standing Zenoss JSON router API, still documented and supported for Zenoss Cloud Collection Zones and on-premises Zenoss Resource Manager / Service…
 
-## Timestamps
+### Published properties
 
-- **Created:** 2026-03-27
-- **Modified:** 2026-03-27
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
 
-## APIs
+#### AsyncAPI (1)
 
-### Zenoss
+Event-driven and webhook contracts.
 
-Zenoss is an AIOps and full-stack monitoring platform for hybrid IT infrastructure observability and event management.
+- [Zenoss Webhooks](https://apis.io/asyncapis/zenoss/zenoss-webhooks/)
 
-- **Human URL:** [https://www.zenoss.com](https://www.zenoss.com)
+#### MCP servers (1)
 
-#### Tags
+Model Context Protocol servers that expose the API to agents.
 
-- AIOps
+- [zenoss-mcp.yml](https://apis.io/servers/zenoss/zenoss-mcp-yml/)
 
-#### Properties
+#### Security (3)
 
-- [Documentation](https://zenoss.github.io/zenoss-prodbin/)
+Authentication, trust centre, and vulnerability disclosure.
 
-## Common Properties
+- [Zenoss Authentication](https://apis.io/security/zenoss/zenoss-authentication/)
+- [Zenoss Domain Security](https://apis.io/security/zenoss/zenoss-domain-security/)
+- [Zenoss Trust Center](https://apis.io/security/zenoss/zenoss-trust-center/)
 
-- [GitHub Organization](https://github.com/zenoss)
-- [LinkedIn](https://www.linkedin.com/company/zenoss-inc-)
+#### Plans and pricing (1)
+
+Published plans, tiers and prices.
+
+- [Zenoss Plans Pricing](https://apis.io/plans/zenoss/zenoss-plans-pricing/)
+
+#### Rate limits (1)
+
+Published request limits.
+
+- [Zenoss Rate Limits](https://apis.io/rate-limits/zenoss/zenoss-rate-limits/)
+
+#### FinOps (1)
+
+What the API costs to run, by operation.
+
+- [Zenoss Finops](https://apis.io/finops/zenoss/zenoss-finops/)
+
+## Where to find this API
+
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
+
 - [Website](https://www.zenoss.com)
-- [Documentation](https://zenoss.github.io/zenoss-prodbin/)
+- [Documentation](https://docs.zenoss.io/)
+- [Getting started](https://docs.zenoss.io/start/get-started.html)
+- [API reference](https://docs.zenoss.io/api/zenoss-api.html)
+- [Support](https://www.virtana.com/support/)
+- [Changelog](https://docs.zenoss.io/admin/updates/cloud-updates.html)
+- [Blog](https://www.virtana.com/blog/)
+- [Trust centre](https://www.virtana.com/trust/)
+- [Terms of service](https://www.virtana.com/legal-notices/)
+- [Privacy policy](https://www.virtana.com/privacy/)
+- [GitHub](https://github.com/zenoss)
+- [Status](https://status.zenoss.io/)
 
-## Maintainers
+## API Evangelist rating
 
-**FN:** Kin Lane
-**Email:** kin@apievangelist.com
+**Kin Score 50.1** — developing · rubric 0.25.0 · scored 2026-10-23
+
+| Facet | Score |
+|---|---|
+| Discoverability | 78.6 |
+| Contract quality | 39.0 |
+| Contract governance | 31.8 |
+| Operational transparency | 50.0 |
+| Developer ergonomics | 56.5 |
+| Access clarity | 43.4 |
+
+**Agent readiness 26.1** — agent-aware
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | yes |
+| Agentic Access | — |
+| Reversibility Documented | — |
+| MCP Server | — |
+| Auth Clarity | bearer (partial credit) |
+| Idempotency | — |
+| Error Semantics | documented (partial credit) |
+| OpenAPI Examples | — |
+| Rate Limit Signal | documented (partial credit) |
+| Event Surface Described | yes |
+| Agent Skills | derived (partial credit) |
+| Well Known Catalog | — |
+| Consent Identity | — |
+| Agent Card | — |
+| Dry Run Mode | — |
+| Delegated Identity | — |
+| Protected Resource Metadata | — |
+| Dynamic Client Registration | — |
+| Agentic Commerce | — |
+| Pagination Ratio | na |
+| Operation Distinctiveness | na |
+
+**Regulatory alignment 29.4** — Horizontal (data, software, accessibility, platform)
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/zenoss/](https://apis.io/providers/zenoss/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for Zenoss: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/zenoss/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
